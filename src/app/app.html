@@ -1,5 +1,47 @@
 <div class="app-shell">
   <header class="app-topbar">
+    <button
+      *ngIf="accountState() === 'ready'"
+      type="button"
+      class="topbar-action"
+      (click)="openCreateTripDialog()"
+    >
+      {{ copy().tripsPage.actions.openCreate }}
+    </button>
+
+    <div *ngIf="accountState() === 'ready'" class="profile-menu-shell">
+      <button
+        type="button"
+        class="profile-trigger"
+        [attr.aria-label]="copy().common.profile.openMenu"
+        (click)="toggleProfileMenu()"
+      >
+        <i class="bi bi-person-circle"></i>
+      </button>
+
+      <button
+        *ngIf="isProfileMenuOpen()"
+        type="button"
+        class="profile-menu-backdrop"
+        [attr.aria-label]="copy().common.profile.cancel"
+        (click)="closeProfileMenu()"
+      ></button>
+
+      <section *ngIf="isProfileMenuOpen()" class="profile-menu" role="menu">
+        <p class="profile-menu-label">{{ copy().common.profile.signedInAs }}</p>
+        <p class="profile-menu-account">{{ currentUserEmail() }}</p>
+        <button type="button" class="profile-menu-item" (click)="openAccountDialog('change-password')">
+          {{ copy().common.profile.changePassword }}
+        </button>
+        <button type="button" class="profile-menu-item profile-menu-item-danger" (click)="openAccountDialog('delete-account')">
+          {{ copy().common.profile.deleteAccount }}
+        </button>
+        <button type="button" class="profile-menu-item" (click)="signOut()">
+          {{ copy().common.profile.signOut }}
+        </button>
+      </section>
+    </div>
+
     <div class="language-switcher" [attr.aria-label]="copy().common.languageSwitcherLabel">
       <button
         type="button"
@@ -19,4 +61,207 @@
   </header>
 
   <router-outlet />
+
+  <div
+    *ngIf="isCreateTripDialogOpen()"
+    class="account-dialog-backdrop"
+    (click)="closeCreateTripDialog()"
+  >
+    <section
+      class="account-dialog trip-dialog"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="copy().tripsPage.createTripTitle"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 class="account-dialog-title">{{ copy().tripsPage.createTripTitle }}</h2>
+      <p class="account-dialog-text">{{ copy().tripsPage.createTripSubtitle }}</p>
+
+      <form class="account-form" [formGroup]="tripForm" (ngSubmit)="createTrip()">
+        <label class="account-field">
+          <span>{{ copy().tripsPage.fields.title }}</span>
+          <input type="text" formControlName="title" />
+        </label>
+
+        <label class="account-field">
+          <span>{{ copy().tripsPage.fields.destination }}</span>
+          <input type="text" formControlName="destination" />
+        </label>
+
+        <div class="trip-dialog-grid">
+          <label class="account-field">
+            <span>{{ copy().tripsPage.fields.people }}</span>
+            <input type="number" min="1" formControlName="peopleCount" />
+          </label>
+
+          <label class="account-field">
+            <span>{{ copy().tripsPage.fields.startDate }}</span>
+            <input type="date" formControlName="startDate" />
+          </label>
+
+          <label class="account-field">
+            <span>{{ copy().tripsPage.fields.endDate }}</span>
+            <input type="date" formControlName="endDate" />
+          </label>
+        </div>
+
+        <label class="account-field">
+          <span>{{ copy().tripsPage.fields.notes }}</span>
+          <textarea rows="4" formControlName="notes"></textarea>
+        </label>
+
+        <div *ngIf="tripFormError()" class="account-error">
+          {{ tripFormError() }}
+        </div>
+
+        <div class="account-actions">
+          <button type="button" class="account-secondary-button" (click)="closeCreateTripDialog()">
+            {{ copy().tripsPage.actions.cancel }}
+          </button>
+          <button
+            type="submit"
+            class="account-primary-button"
+            [disabled]="tripForm.invalid || isCreatingTrip()"
+          >
+            {{
+              isCreatingTrip()
+                ? copy().tripsPage.createTripSubmitting
+                : copy().tripsPage.createTripSubmit
+            }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div *ngIf="accountNotice()" class="account-notice">
+    {{ accountNotice() }}
+  </div>
+
+  <div
+    *ngIf="accountDialog() !== 'none'"
+    class="account-dialog-backdrop"
+    (click)="closeAccountDialog()"
+  >
+    <section
+      class="account-dialog"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="copy().common.profile.title"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 class="account-dialog-title">
+        {{
+          accountDialog() === 'change-password'
+            ? copy().common.profile.changePassword
+            : copy().common.profile.deleteAccount
+        }}
+      </h2>
+
+      <p class="account-dialog-text">
+        {{
+          accountDialog() === 'change-password'
+            ? copy().common.profile.currentPasswordHelp
+            : copy().common.profile.deleteAccountHelp
+        }}
+      </p>
+
+      <form
+        *ngIf="accountDialog() === 'change-password'"
+        class="account-form"
+        [formGroup]="changePasswordForm"
+        (ngSubmit)="changePassword()"
+      >
+        <label class="account-field">
+          <span>{{ copy().common.currentPassword }}</span>
+          <div class="account-password-field">
+            <input
+              [type]="showCurrentPassword() ? 'text' : 'password'"
+              formControlName="currentPassword"
+            />
+            <button
+              type="button"
+              class="account-password-toggle"
+              [attr.aria-label]="showCurrentPassword() ? copy().common.hidePassword : copy().common.showPassword"
+              (click)="toggleCurrentPasswordVisibility()"
+            >
+              <i class="bi" [class.bi-eye]="!showCurrentPassword()" [class.bi-eye-slash]="showCurrentPassword()"></i>
+            </button>
+          </div>
+        </label>
+
+        <label class="account-field">
+          <span>{{ copy().common.newPassword }}</span>
+          <div class="account-password-field">
+            <input
+              [type]="showNewPassword() ? 'text' : 'password'"
+              formControlName="newPassword"
+            />
+            <button
+              type="button"
+              class="account-password-toggle"
+              [attr.aria-label]="showNewPassword() ? copy().common.hidePassword : copy().common.showPassword"
+              (click)="toggleNewPasswordVisibility()"
+            >
+              <i class="bi" [class.bi-eye]="!showNewPassword()" [class.bi-eye-slash]="showNewPassword()"></i>
+            </button>
+          </div>
+        </label>
+
+        <div *ngIf="accountError()" class="account-error">
+          {{ accountError() }}
+        </div>
+
+        <div class="account-actions">
+          <button type="button" class="account-secondary-button" (click)="closeAccountDialog()">
+            {{ copy().common.profile.cancel }}
+          </button>
+          <button
+            type="submit"
+            class="account-primary-button"
+            [disabled]="changePasswordForm.invalid || authStateService.isSubmitting()"
+          >
+            {{
+              authStateService.isSubmitting()
+                ? copy().common.profile.updatingPassword
+                : copy().common.profile.updatePassword
+            }}
+          </button>
+        </div>
+      </form>
+
+      <form
+        *ngIf="accountDialog() === 'delete-account'"
+        class="account-form"
+        [formGroup]="deleteAccountForm"
+        (ngSubmit)="deleteAccount()"
+      >
+        <label class="account-field">
+          <span>{{ copy().common.currentPassword }}</span>
+          <input type="password" formControlName="currentPassword" />
+        </label>
+
+        <div *ngIf="accountError()" class="account-error">
+          {{ accountError() }}
+        </div>
+
+        <div class="account-actions">
+          <button type="button" class="account-secondary-button" (click)="closeAccountDialog()">
+            {{ copy().common.profile.cancel }}
+          </button>
+          <button
+            type="submit"
+            class="account-danger-button"
+            [disabled]="deleteAccountForm.invalid || authStateService.isSubmitting()"
+          >
+            {{
+              authStateService.isSubmitting()
+                ? copy().common.profile.deletingAccount
+                : copy().common.profile.confirmDelete
+            }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
 </div>

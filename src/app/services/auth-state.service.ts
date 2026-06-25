@@ -1,10 +1,14 @@
 import { Injectable, signal } from '@angular/core';
 import {
+  EmailAuthProvider,
   User,
   createUserWithEmailAndPassword,
+  deleteUser,
   onAuthStateChanged,
+  reauthenticateWithCredential,
   signInWithEmailAndPassword,
-  signOut
+  signOut,
+  updatePassword
 } from 'firebase/auth';
 
 import { auth } from '../firebase.config';
@@ -69,6 +73,44 @@ export class AuthStateService {
   async signOutUser(): Promise<void> {
     this.authError.set(null);
     await signOut(auth);
+  }
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    this.authError.set(null);
+    this.isSubmitting.set(true);
+
+    try {
+      const user = await this.reauthenticateWithPassword(currentPassword);
+      await updatePassword(user, newPassword);
+    } catch (error) {
+      this.authError.set(this.toErrorMessage(error));
+      throw error;
+    } finally {
+      this.isSubmitting.set(false);
+    }
+  }
+
+  async reauthenticateWithPassword(currentPassword: string): Promise<User> {
+    const user = this.currentUser();
+
+    if (!user || !user.email) {
+      throw new Error('Authenticated email user is required.');
+    }
+
+    const credential = EmailAuthProvider.credential(user.email, currentPassword);
+    await reauthenticateWithCredential(user, credential);
+
+    return user;
+  }
+
+  async deleteCurrentUser(): Promise<void> {
+    const user = this.currentUser();
+
+    if (!user) {
+      throw new Error('Authenticated user is required.');
+    }
+
+    await deleteUser(user);
   }
 
   clearAuthError(): void {

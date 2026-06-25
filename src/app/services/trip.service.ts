@@ -8,6 +8,7 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
   onSnapshot,
   query,
   updateDoc,
@@ -49,13 +50,7 @@ export class TripService {
           subscriber.next(
             snapshot.docs
               .map((tripDocument) => this.mapTripDocument(tripDocument))
-              .sort((left, right) => {
-                if (left.year !== right.year) {
-                  return right.year - left.year;
-                }
-
-                return left.startDate.localeCompare(right.startDate);
-              })
+              .sort((left, right) => left.startDate.localeCompare(right.startDate))
           );
         },
         (error) => subscriber.error(error)
@@ -128,6 +123,14 @@ export class TripService {
     }
 
     await deleteDoc(doc(this.tripsCollection, tripId));
+  }
+
+  async deleteTripsForCurrentUser(): Promise<void> {
+    const ownerId = this.authStateService.getRequiredUserId();
+    const tripsQuery = query(this.tripsCollection, where('ownerId', '==', ownerId));
+    const snapshot = await getDocs(tripsQuery);
+
+    await Promise.all(snapshot.docs.map((tripDocument) => deleteDoc(tripDocument.ref)));
   }
 
   private mapTripDocument(tripDocument: QueryDocumentSnapshot<TripDocument>): Trip {

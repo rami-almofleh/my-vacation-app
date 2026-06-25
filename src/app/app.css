@@ -6,7 +6,107 @@
 .app-topbar {
   display: flex;
   justify-content: flex-end;
+  gap: 12px;
+  align-items: center;
   padding: 12px 20px 0;
+}
+
+.topbar-action {
+  border: 1px solid #111827;
+  border-radius: 8px;
+  background: #111827;
+  color: #fff;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.profile-menu-shell {
+  position: relative;
+}
+
+.profile-trigger {
+  border: 1px solid #d9dee7;
+  border-radius: 8px;
+  background: #fff;
+  color: #374151;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-trigger i {
+  font-size: 1.2rem;
+}
+
+.profile-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  border: 0;
+  background: transparent;
+  z-index: 90;
+}
+
+.profile-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(280px, calc(100vw - 32px));
+  border: 1px solid #d9dee7;
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+  z-index: 100;
+}
+
+.profile-menu-account {
+  margin: 0 0 8px;
+  padding: 0 8px 10px;
+  border-bottom: 1px solid #eef2f7;
+  color: #5b6472;
+  font-size: 0.9rem;
+  word-break: break-word;
+}
+
+.profile-menu-label {
+  margin: 0;
+  padding: 6px 8px 4px;
+  color: #7a8391;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.profile-menu-item {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #374151;
+  padding: 10px 8px;
+  text-align: left;
+  font: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.profile-menu-item:hover {
+  background: #f8fafc;
+}
+
+.profile-menu-item-danger {
+  color: #8a2424;
 }
 
 .language-switcher {
@@ -31,4 +131,185 @@
 .language-switcher button.is-active {
   background: #111827;
   color: #fff;
+}
+
+.account-notice {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  max-width: min(420px, calc(100vw - 32px));
+  border: 1px solid #b7ddc0;
+  border-radius: 8px;
+  background: #f3fbf5;
+  color: #1f6b35;
+  padding: 12px 14px;
+  z-index: 1200;
+}
+
+.account-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 1100;
+}
+
+.account-dialog {
+  width: min(480px, 100%);
+  border: 1px solid #d9dee7;
+  border-radius: 8px;
+  background: #fff;
+  padding: 20px;
+}
+
+.account-dialog-title {
+  margin: 0 0 10px;
+  font-size: 1.2rem;
+}
+
+.account-dialog-text {
+  margin: 0 0 16px;
+  color: #5b6472;
+}
+
+.account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.trip-dialog {
+  width: min(720px, 100%);
+}
+
+.trip-dialog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.account-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.account-field span {
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.account-field input,
+.account-field textarea {
+  width: 100%;
+  border: 1px solid #c8d1dc;
+  border-radius: 8px;
+  background: #fff;
+  color: #111827;
+  padding: 12px 14px;
+  font: inherit;
+}
+
+.account-password-field {
+  position: relative;
+}
+
+.account-password-field input {
+  padding-right: 48px;
+}
+
+.account-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: #4b5563;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.account-error {
+  border: 1px solid #f0b6b6;
+  border-radius: 8px;
+  background: #fff5f5;
+  color: #8a2424;
+  padding: 12px 14px;
+}
+
+.account-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.account-secondary-button,
+.account-primary-button,
+.account-danger-button {
+  border-radius: 8px;
+  padding: 10px 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.account-secondary-button {
+  border: 1px solid #c8d1dc;
+  background: #fff;
+  color: #374151;
+}
+
+.account-primary-button {
+  border: 1px solid #111827;
+  background: #111827;
+  color: #fff;
+}
+
+.account-danger-button {
+  border: 1px solid #e2b8b8;
+  background: #fff5f5;
+  color: #8a2424;
+}
+
+.account-primary-button:disabled,
+.account-danger-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .app-topbar {
+    padding: 12px 16px 0;
+  }
+
+  .topbar-action {
+    padding: 8px 10px;
+  }
+
+  .profile-menu {
+    width: min(280px, calc(100vw - 24px));
+  }
+
+  .trip-dialog-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-notice {
+    right: 16px;
+    bottom: 16px;
+  }
+
+  .account-dialog-backdrop {
+    align-items: flex-end;
+    padding: 16px;
+  }
 }

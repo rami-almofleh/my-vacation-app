@@ -7,6 +7,29 @@ export interface TranslationDictionary {
     signIn: string;
     create: string;
     languageSwitcherLabel: string;
+    currentPassword: string;
+    newPassword: string;
+    email: string;
+    showPassword: string;
+    hidePassword: string;
+    profile: {
+      openMenu: string;
+      title: string;
+      signedInAs: string;
+      changePassword: string;
+      deleteAccount: string;
+      signOut: string;
+      cancel: string;
+      confirmDelete: string;
+      updatePassword: string;
+      updatingPassword: string;
+      deletingAccount: string;
+      passwordChanged: string;
+      accountDeleted: string;
+      currentPasswordHelp: string;
+      deleteAccountHelp: string;
+      accountActionFailed: string;
+    };
   };
   tripsPage: {
     title: string;
@@ -36,6 +59,10 @@ export interface TranslationDictionary {
     createTripSubtitle: string;
     createTripSubmit: string;
     createTripSubmitting: string;
+    editTripTitle: string;
+    editTripSubtitle: string;
+    editTripSubmit: string;
+    editTripSubmitting: string;
     fields: {
       title: string;
       destination: string;
@@ -54,12 +81,17 @@ export interface TranslationDictionary {
       deleteFailed: string;
     };
     actions: {
+      openCreate: string;
+      edit: string;
       delete: string;
       deleting: string;
+      cancel: string;
       deleteConfirm: string;
     };
     card: {
       travelers: string;
+      currentBadge: string;
+      nextBadge: string;
     };
   };
   tripDetailPage: {

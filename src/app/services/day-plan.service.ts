@@ -149,6 +149,14 @@ export class DayPlanService {
     await Promise.all(snapshot.docs.map((dayPlanDocument) => deleteDoc(dayPlanDocument.ref)));
   }
 
+  async deleteDayPlansForCurrentUser(): Promise<void> {
+    const ownerId = this.authStateService.getRequiredUserId();
+    const dayPlansQuery = query(this.dayPlansCollection, where('ownerId', '==', ownerId));
+    const snapshot = await getDocs(dayPlansQuery);
+
+    await Promise.all(snapshot.docs.map((dayPlanDocument) => deleteDoc(dayPlanDocument.ref)));
+  }
+
   private mapDayPlanDocument(dayPlanDocument: QueryDocumentSnapshot<DayPlanDocument>): DayPlan {
     const dayPlanData = dayPlanDocument.data();
 

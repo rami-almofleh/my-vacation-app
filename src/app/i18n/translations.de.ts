@@ -6,7 +6,30 @@ export const translationsDe: TranslationDictionary = {
     back: 'Zurueck',
     signIn: 'Anmelden',
     create: 'Erstellen',
-    languageSwitcherLabel: 'Sprachauswahl'
+    languageSwitcherLabel: 'Sprachauswahl',
+    currentPassword: 'Aktuelles Passwort',
+    newPassword: 'Neues Passwort',
+    email: 'E-Mail',
+    showPassword: 'Passwort anzeigen',
+    hidePassword: 'Passwort ausblenden',
+    profile: {
+      openMenu: 'Profilmenue oeffnen',
+      title: 'Profil',
+      signedInAs: 'Angemeldet als',
+      changePassword: 'Passwort aendern',
+      deleteAccount: 'Konto loeschen',
+      signOut: 'Abmelden',
+      cancel: 'Abbrechen',
+      confirmDelete: 'Konto loeschen',
+      updatePassword: 'Passwort speichern',
+      updatingPassword: 'Wird gespeichert...',
+      deletingAccount: 'Konto wird geloescht...',
+      passwordChanged: 'Passwort erfolgreich geaendert.',
+      accountDeleted: 'Konto erfolgreich geloescht.',
+      currentPasswordHelp: 'Gib dein aktuelles Passwort zur Bestaetigung ein.',
+      deleteAccountHelp: 'Dadurch werden dein Konto und alle gespeicherten Urlaube geloescht.',
+      accountActionFailed: 'Konto-Aktion konnte nicht ausgefuehrt werden.'
+    }
   },
   tripsPage: {
     title: 'Deine Urlaube',
@@ -36,6 +59,10 @@ export const translationsDe: TranslationDictionary = {
     createTripSubtitle: 'Lege zuerst die Basisdaten an. Die Tagesplanung folgt danach.',
     createTripSubmit: 'Urlaub anlegen',
     createTripSubmitting: 'Wird erstellt...',
+    editTripTitle: 'Urlaub bearbeiten',
+    editTripSubtitle: 'Passe hier die Basisdaten des Urlaubs an.',
+    editTripSubmit: 'Aenderungen speichern',
+    editTripSubmitting: 'Wird gespeichert...',
     fields: {
       title: 'Titel',
       destination: 'Reiseziel',
@@ -54,12 +81,17 @@ export const translationsDe: TranslationDictionary = {
       deleteFailed: 'Der Urlaub konnte nicht geloescht werden.'
     },
     actions: {
+      openCreate: 'Urlaub anlegen',
+      edit: 'Bearbeiten',
       delete: 'Loeschen',
       deleting: 'Wird geloescht...',
+      cancel: 'Abbrechen',
       deleteConfirm: 'Diesen Urlaub und alle Tagesplaene dazu loeschen?'
     },
     card: {
-      travelers: 'Reisende'
+      travelers: 'Reisende',
+      currentBadge: 'Aktuell',
+      nextBadge: 'Als Nächstes'
     }
   },
   tripDetailPage: {

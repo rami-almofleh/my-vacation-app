@@ -6,7 +6,30 @@ export const translationsEn: TranslationDictionary = {
     back: 'Back',
     signIn: 'Sign in',
     create: 'Create',
-    languageSwitcherLabel: 'Language switcher'
+    languageSwitcherLabel: 'Language switcher',
+    currentPassword: 'Current password',
+    newPassword: 'New password',
+    email: 'Email',
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
+    profile: {
+      openMenu: 'Open profile menu',
+      title: 'Profile',
+      signedInAs: 'Signed in as',
+      changePassword: 'Change password',
+      deleteAccount: 'Delete account',
+      signOut: 'Sign out',
+      cancel: 'Cancel',
+      confirmDelete: 'Delete account',
+      updatePassword: 'Save password',
+      updatingPassword: 'Saving...',
+      deletingAccount: 'Deleting account...',
+      passwordChanged: 'Password updated successfully.',
+      accountDeleted: 'Account deleted successfully.',
+      currentPasswordHelp: 'Enter your current password to confirm this action.',
+      deleteAccountHelp: 'This deletes your account and all saved trips.',
+      accountActionFailed: 'Account action failed.'
+    }
   },
   tripsPage: {
     title: 'Your trips',
@@ -36,6 +59,10 @@ export const translationsEn: TranslationDictionary = {
     createTripSubtitle: 'Add the basics first. You can plan each day after that.',
     createTripSubmit: 'Create trip',
     createTripSubmitting: 'Creating...',
+    editTripTitle: 'Edit trip',
+    editTripSubtitle: 'Update the basic trip details here.',
+    editTripSubmit: 'Save changes',
+    editTripSubmitting: 'Saving...',
     fields: {
       title: 'Title',
       destination: 'Destination',
@@ -54,12 +81,17 @@ export const translationsEn: TranslationDictionary = {
       deleteFailed: 'Failed to delete trip.'
     },
     actions: {
+      openCreate: 'Create trip',
+      edit: 'Edit',
       delete: 'Delete',
       deleting: 'Deleting...',
+      cancel: 'Cancel',
       deleteConfirm: 'Delete this trip and all of its day plans?'
     },
     card: {
-      travelers: 'travelers'
+      travelers: 'travelers',
+      currentBadge: 'Current',
+      nextBadge: 'Next'
     }
   },
   tripDetailPage: {
