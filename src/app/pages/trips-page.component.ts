@@ -17,7 +17,7 @@ import { TripService } from '../services/trip.service';
     <main class="trips-page">
       <section class="trips-header">
         <div>
-          <h1 class="trips-title">Your trips</h1>
+          <h1 class="trips-title">{{ copy().tripsPage.title }}</h1>
           <p class="trips-subtitle">{{ copy().tripsPage.subtitle }}</p>
         </div>
       </section>
@@ -27,7 +27,73 @@ import { TripService } from '../services/trip.service';
       </section>
 
       <section *ngIf="accountState() === 'signed-out'" class="trips-state">
-        <p>{{ copy().tripsPage.signedOut }}</p>
+        <div class="auth-panel-header">
+          <div>
+            <h2 class="trip-form-title">{{ copy().tripsPage.auth.title }}</h2>
+            <p class="trip-form-subtitle">{{ copy().tripsPage.auth.subtitle }}</p>
+          </div>
+        </div>
+
+        <div class="auth-mode-switch" role="tablist" [attr.aria-label]="copy().tripsPage.auth.title">
+          <button
+            type="button"
+            [class.is-active]="authMode() === 'sign-in'"
+            (click)="setAuthMode('sign-in')"
+          >
+            {{ copy().tripsPage.auth.signInTab }}
+          </button>
+          <button
+            type="button"
+            [class.is-active]="authMode() === 'sign-up'"
+            (click)="setAuthMode('sign-up')"
+          >
+            {{ copy().tripsPage.auth.signUpTab }}
+          </button>
+        </div>
+
+        <form class="trip-form" [formGroup]="authForm" (ngSubmit)="submitAuth()">
+          <label class="field">
+            <span>{{ copy().tripsPage.auth.email }}</span>
+            <input type="email" formControlName="email" />
+          </label>
+
+          <label class="field">
+            <span>{{ copy().tripsPage.auth.password }}</span>
+            <div class="password-field">
+              <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" />
+              <button
+                type="button"
+                class="password-toggle"
+                [attr.aria-label]="showPassword() ? copy().tripsPage.auth.hidePassword : copy().tripsPage.auth.showPassword"
+                (click)="togglePasswordVisibility()"
+              >
+                <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
+              </button>
+            </div>
+          </label>
+
+          <div *ngIf="authSuccessMessage()" class="trip-form-success">
+            <p>{{ authSuccessMessage() }}</p>
+          </div>
+
+          <div *ngIf="authErrorMessage()" class="trip-form-error">
+            <p>{{ authErrorMessage() }}</p>
+          </div>
+
+          <div class="trip-form-actions">
+            <button type="submit" [disabled]="authForm.invalid || authStateService.isSubmitting()">
+              {{
+                authMode() === 'sign-in'
+                  ? (authStateService.isSubmitting()
+                    ? copy().tripsPage.auth.signInSubmitting
+                    : copy().tripsPage.auth.signInSubmit)
+                  : (authStateService.isSubmitting()
+                    ? copy().tripsPage.auth.signUpSubmitting
+                    : copy().tripsPage.auth.signUpSubmit)
+              }}
+            </button>
+          </div>
+        </form>
       </section>
 
       <section *ngIf="accountState() === 'ready'">
@@ -36,6 +102,11 @@ import { TripService } from '../services/trip.service';
             <div>
               <h2 class="trip-form-title">{{ copy().tripsPage.createTripTitle }}</h2>
               <p class="trip-form-subtitle">{{ copy().tripsPage.createTripSubtitle }}</p>
+            </div>
+            <div class="trip-form-actions">
+              <button type="button" class="secondary-button" (click)="signOut()">
+                {{ copy().tripsPage.auth.signOut }}
+              </button>
             </div>
           </div>
 
@@ -143,6 +214,14 @@ import { TripService } from '../services/trip.service';
     }
 
     .trip-form-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .auth-panel-header {
       margin-bottom: 16px;
     }
 
@@ -180,6 +259,30 @@ import { TripService } from '../services/trip.service';
       gap: 16px;
     }
 
+    .auth-mode-switch {
+      display: inline-flex;
+      border: 1px solid #c8d1dc;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .auth-mode-switch button,
+    .secondary-button {
+      border: 0;
+      background: transparent;
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      color: #374151;
+    }
+
+    .auth-mode-switch button.is-active {
+      background: #111827;
+      color: #fff;
+    }
+
     .field {
       display: flex;
       flex-direction: column;
@@ -201,6 +304,30 @@ import { TripService } from '../services/trip.service';
       font: inherit;
       background: #fff;
       color: #111827;
+    }
+
+    .password-field {
+      position: relative;
+    }
+
+    .password-field input {
+      padding-right: 48px;
+    }
+
+    .password-toggle {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      border: 0;
+      background: transparent;
+      color: #4b5563;
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
     }
 
     .field input:focus,
@@ -230,12 +357,26 @@ import { TripService } from '../services/trip.service';
       cursor: not-allowed;
     }
 
+    .secondary-button {
+      border: 1px solid #c8d1dc;
+      border-radius: 8px;
+      background: #fff;
+    }
+
     .trip-form-error {
       border: 1px solid #f0b6b6;
       border-radius: 8px;
       padding: 12px 14px;
       background: #fff5f5;
       color: #8a2424;
+    }
+
+    .trip-form-success {
+      border: 1px solid #b7ddc0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      background: #f3fbf5;
+      color: #1f6b35;
     }
 
     .trips-state-error {
@@ -334,6 +475,12 @@ export class TripsPageComponent implements OnDestroy {
   readonly loadError = signal<string | null>(null);
   readonly isCreatingTrip = signal(false);
   readonly tripFormError = signal<string | null>(null);
+  readonly authMode = signal<'sign-in' | 'sign-up'>('sign-in');
+  readonly showPassword = signal(false);
+  readonly authSuccessMessage = signal<string | null>(null);
+  readonly authErrorMessage = computed(
+    () => this.authStateService.authError() ?? null
+  );
   readonly hasTrips = computed(() => this.trips().length > 0);
   readonly accountState = computed<'loading' | 'signed-out' | 'ready'>(() => {
     if (!this.authStateService.isReady()) {
@@ -349,6 +496,10 @@ export class TripsPageComponent implements OnDestroy {
     startDate: ['', Validators.required],
     endDate: ['', Validators.required],
     notes: ['', [Validators.maxLength(500)]]
+  });
+  readonly authForm = this.formBuilder.nonNullable.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]]
   });
   
   private readonly watchTripsEffect = effect(() => {
@@ -381,6 +532,51 @@ export class TripsPageComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.tripSubscription?.unsubscribe();
+  }
+
+  setAuthMode(mode: 'sign-in' | 'sign-up'): void {
+    this.authMode.set(mode);
+    this.authSuccessMessage.set(null);
+    this.authStateService.clearAuthError();
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword.update((currentValue) => !currentValue);
+  }
+
+  async submitAuth(): Promise<void> {
+    this.authSuccessMessage.set(null);
+    this.authStateService.clearAuthError();
+
+    if (this.authForm.invalid) {
+      this.authForm.markAllAsTouched();
+      return;
+    }
+
+    const { email, password } = this.authForm.getRawValue();
+
+    try {
+      if (this.authMode() === 'sign-in') {
+        await this.authStateService.signInWithEmail(email.trim(), password);
+      } else {
+        await this.authStateService.signUpWithEmail(email.trim(), password);
+        this.authSuccessMessage.set(this.copy().tripsPage.authSuccess);
+      }
+
+      this.authForm.reset({
+        email: '',
+        password: ''
+      });
+    } catch (error) {
+      if (!(error instanceof Error)) {
+        this.authStateService.authError.set(this.copy().tripsPage.validation.authFailed);
+      }
+    }
+  }
+
+  async signOut(): Promise<void> {
+    this.authSuccessMessage.set(null);
+    await this.authStateService.signOutUser();
   }
 
   async createTrip(): Promise<void> {

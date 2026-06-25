@@ -13,6 +13,22 @@ export const translationsEn: TranslationDictionary = {
     subtitle: 'See all saved vacations and open one to continue planning.',
     loadingAccount: 'Loading account...',
     signedOut: 'Sign in to see your trips.',
+    authSuccess: 'Account created successfully. You are now signed in.',
+    auth: {
+      title: 'Sign in or create an account',
+      subtitle: 'Your trips are tied to your account, so sign in before you start planning.',
+      email: 'Email',
+      password: 'Password',
+      showPassword: 'Show password',
+      hidePassword: 'Hide password',
+      signInTab: 'Sign in',
+      signUpTab: 'Register',
+      signInSubmit: 'Sign in',
+      signInSubmitting: 'Signing in...',
+      signUpSubmit: 'Create account',
+      signUpSubmitting: 'Creating account...',
+      signOut: 'Sign out'
+    },
     loadingTrips: 'Loading trips...',
     emptyTitle: 'No trips yet',
     emptyBody: 'Create your first trip next.',
@@ -30,7 +46,8 @@ export const translationsEn: TranslationDictionary = {
     },
     validation: {
       invalidDateRange: 'End date must be on or after the start date.',
-      createFailed: 'Failed to create trip.'
+      createFailed: 'Failed to create trip.',
+      authFailed: 'Authentication request failed.'
     },
     errors: {
       loadFailed: 'Failed to load trips.'

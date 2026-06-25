@@ -13,6 +13,22 @@ export interface TranslationDictionary {
     subtitle: string;
     loadingAccount: string;
     signedOut: string;
+    authSuccess: string;
+    auth: {
+      title: string;
+      subtitle: string;
+      email: string;
+      password: string;
+      showPassword: string;
+      hidePassword: string;
+      signInTab: string;
+      signUpTab: string;
+      signInSubmit: string;
+      signInSubmitting: string;
+      signUpSubmit: string;
+      signUpSubmitting: string;
+      signOut: string;
+    };
     loadingTrips: string;
     emptyTitle: string;
     emptyBody: string;
@@ -31,6 +47,7 @@ export interface TranslationDictionary {
     validation: {
       invalidDateRange: string;
       createFailed: string;
+      authFailed: string;
     };
     errors: {
       loadFailed: string;

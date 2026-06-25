@@ -9,7 +9,6 @@ import {
   doc,
   getDoc,
   onSnapshot,
-  orderBy,
   query,
   updateDoc,
   where
@@ -25,6 +24,12 @@ export type CreateDayPlanInput = Omit<DayPlanDocument, 'ownerId' | 'createdAt' |
 
 export type UpdateDayPlanInput = Partial<Omit<DayPlanDocument, 'ownerId' | 'tripId' | 'createdAt'>>;
 
+function removeUndefinedFields<T extends Record<string, unknown>>(value: T): T {
+  return Object.fromEntries(
+    Object.entries(value).filter(([, entryValue]) => entryValue !== undefined)
+  ) as T;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -38,15 +43,18 @@ export class DayPlanService {
     const dayPlansQuery = query(
       this.dayPlansCollection,
       where('ownerId', '==', ownerId),
-      where('tripId', '==', tripId),
-      orderBy('date', 'asc')
+      where('tripId', '==', tripId)
     );
 
     return new Observable<DayPlan[]>((subscriber) => {
       const unsubscribe = onSnapshot(
         dayPlansQuery,
         (snapshot) => {
-          subscriber.next(snapshot.docs.map((dayPlanDocument) => this.mapDayPlanDocument(dayPlanDocument)));
+          subscriber.next(
+            snapshot.docs
+              .map((dayPlanDocument) => this.mapDayPlanDocument(dayPlanDocument))
+              .sort((left, right) => left.date.localeCompare(right.date))
+          );
         },
         (error) => subscriber.error(error)
       );
@@ -94,7 +102,10 @@ export class DayPlanService {
       updatedAt: timestamp
     };
 
-    const dayPlanReference = await addDoc(this.dayPlansCollection, dayPlanPayload);
+    const dayPlanReference = await addDoc(
+      this.dayPlansCollection,
+      removeUndefinedFields(dayPlanPayload)
+    );
 
     return dayPlanReference.id;
   }
@@ -106,10 +117,13 @@ export class DayPlanService {
       throw new Error('Day plan not found.');
     }
 
-    await updateDoc(doc(this.dayPlansCollection, dayPlanId), {
-      ...updates,
-      updatedAt: new Date().toISOString()
-    });
+    await updateDoc(
+      doc(this.dayPlansCollection, dayPlanId),
+      removeUndefinedFields({
+        ...updates,
+        updatedAt: new Date().toISOString()
+      })
+    );
   }
 
   async deleteDayPlan(dayPlanId: string): Promise<void> {

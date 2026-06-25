@@ -9,7 +9,6 @@ import {
   doc,
   getDoc,
   onSnapshot,
-  orderBy,
   query,
   updateDoc,
   where
@@ -25,6 +24,12 @@ export type CreateTripInput = Omit<TripDocument, 'ownerId' | 'createdAt' | 'upda
 
 export type UpdateTripInput = Partial<Omit<TripDocument, 'ownerId' | 'createdAt'>>;
 
+function removeUndefinedFields<T extends Record<string, unknown>>(value: T): T {
+  return Object.fromEntries(
+    Object.entries(value).filter(([, entryValue]) => entryValue !== undefined)
+  ) as T;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -35,18 +40,23 @@ export class TripService {
 
   watchTrips(): Observable<Trip[]> {
     const ownerId = this.authStateService.getRequiredUserId();
-    const tripsQuery = query(
-      this.tripsCollection,
-      where('ownerId', '==', ownerId),
-      orderBy('year', 'desc'),
-      orderBy('startDate', 'asc')
-    );
+    const tripsQuery = query(this.tripsCollection, where('ownerId', '==', ownerId));
 
     return new Observable<Trip[]>((subscriber) => {
       const unsubscribe = onSnapshot(
         tripsQuery,
         (snapshot) => {
-          subscriber.next(snapshot.docs.map((tripDocument) => this.mapTripDocument(tripDocument)));
+          subscriber.next(
+            snapshot.docs
+              .map((tripDocument) => this.mapTripDocument(tripDocument))
+              .sort((left, right) => {
+                if (left.year !== right.year) {
+                  return right.year - left.year;
+                }
+
+                return left.startDate.localeCompare(right.startDate);
+              })
+          );
         },
         (error) => subscriber.error(error)
       );
@@ -89,7 +99,7 @@ export class TripService {
       updatedAt: timestamp
     };
 
-    const tripReference = await addDoc(this.tripsCollection, tripPayload);
+    const tripReference = await addDoc(this.tripsCollection, removeUndefinedFields(tripPayload));
 
     return tripReference.id;
   }
@@ -101,10 +111,13 @@ export class TripService {
       throw new Error('Trip not found.');
     }
 
-    await updateDoc(doc(this.tripsCollection, tripId), {
-      ...updates,
-      updatedAt: new Date().toISOString()
-    });
+    await updateDoc(
+      doc(this.tripsCollection, tripId),
+      removeUndefinedFields({
+        ...updates,
+        updatedAt: new Date().toISOString()
+      })
+    );
   }
 
   async deleteTrip(tripId: string): Promise<void> {

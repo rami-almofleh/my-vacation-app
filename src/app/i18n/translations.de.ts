@@ -13,6 +13,22 @@ export const translationsDe: TranslationDictionary = {
     subtitle: 'Sieh dir gespeicherte Urlaube an und oeffne einen zum Weiterplanen.',
     loadingAccount: 'Konto wird geladen...',
     signedOut: 'Melde dich an, um deine Urlaube zu sehen.',
+    authSuccess: 'Konto erfolgreich erstellt. Du bist jetzt angemeldet.',
+    auth: {
+      title: 'Anmelden oder Konto erstellen',
+      subtitle: 'Deine Urlaube sind an dein Konto gebunden. Melde dich zuerst an.',
+      email: 'E-Mail',
+      password: 'Passwort',
+      showPassword: 'Passwort anzeigen',
+      hidePassword: 'Passwort ausblenden',
+      signInTab: 'Anmelden',
+      signUpTab: 'Registrieren',
+      signInSubmit: 'Anmelden',
+      signInSubmitting: 'Anmeldung laeuft...',
+      signUpSubmit: 'Konto erstellen',
+      signUpSubmitting: 'Konto wird erstellt...',
+      signOut: 'Abmelden'
+    },
     loadingTrips: 'Urlaube werden geladen...',
     emptyTitle: 'Noch keine Urlaube',
     emptyBody: 'Lege als Naechstes deinen ersten Urlaub an.',
@@ -30,7 +46,8 @@ export const translationsDe: TranslationDictionary = {
     },
     validation: {
       invalidDateRange: 'Das Enddatum muss am oder nach dem Startdatum liegen.',
-      createFailed: 'Der Urlaub konnte nicht erstellt werden.'
+      createFailed: 'Der Urlaub konnte nicht erstellt werden.',
+      authFailed: 'Die Anmeldung konnte nicht verarbeitet werden.'
     },
     errors: {
       loadFailed: 'Urlaube konnten nicht geladen werden.'
