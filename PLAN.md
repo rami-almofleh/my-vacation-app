@@ -322,6 +322,29 @@ Für den MVP wird Firebase Authentication mit `email/password` verwendet.
 - `ownerId` wird beim Erstellen von `trips` und `dayPlans` automatisch gesetzt
 - Die bisherige Aufgabenzeile zur anonymen Anmeldung ist durch E-Mail/Passwort ersetzt
 
+## i18n-Strategie
+Für dieses Projekt wird eine runtime-basierte Übersetzungsstrategie verwendet.
+
+### Entscheidung
+- Die App verwendet einen einfachen, schluesselbasierten i18n-Ansatz zur Laufzeit
+- UI-Texte werden ueber Keys statt ueber hart codierte Endtexte gerendert
+- Die ersten unterstuetzten Sprachen sind:
+  - `en`
+  - `de`
+- Englisch ist die technische Basissprache fuer Keys und Default-Texte
+
+### Warum diese Strategie
+- Die Sprache kann spaeter ohne separaten Build gewechselt werden
+- Der Ansatz ist fuer eine kleine Angular-App einfacher als ein compile-time-only i18n-Setup
+- Neue Views und Komponenten koennen schrittweise auf Uebersetzungskeys umgestellt werden
+- Die Produktanforderung "Code auf Englisch, UI in en/de" passt direkt dazu
+
+### Konsequenz fuer die Umsetzung
+- Es wird eine zentrale Uebersetzungsquelle fuer `en` und `de` angelegt
+- Die App bekommt einen kleinen Sprachstatus bzw. Language-Service
+- Bestehende sichtbare Texte in `trips-page` und `trip-detail-page` werden spaeter auf Keys umgestellt
+- Neue Komponenten sollen ab jetzt keine neuen fest codierten UI-Texte mehr einfuehren, wenn der i18n-Unterbau vorhanden ist
+
 ## Roadmap
 
 ### Phase 0: Projektbasis prüfen und aufräumen
@@ -355,10 +378,10 @@ Für den MVP wird Firebase Authentication mit `email/password` verwendet.
 - [x] Leere Zustände und Ladezustände ergänzen
 
 ### Phase 2.5: Sprache und Übersetzungen
-- [ ] i18n-Strategie für Angular festlegen
-- [ ] Basis-Übersetzungsstruktur für `en` und `de` anlegen
-- [ ] Sprachumschaltung für die App vorbereiten
-- [ ] Bestehende und neue UI-Texte nur noch über Übersetzungskeys ausgeben
+- [x] i18n-Strategie für Angular festlegen
+- [x] Basis-Übersetzungsstruktur für `en` und `de` anlegen
+- [x] Sprachumschaltung für die App vorbereiten
+- [x] Bestehende und neue UI-Texte nur noch über Übersetzungskeys ausgeben
 
 ### Phase 3: Tagesplanung
 - [ ] Accordion- oder Listenkomponente für Tage erstellen
@@ -397,4 +420,4 @@ Für den MVP wird Firebase Authentication mit `email/password` verwendet.
 6. Ändere nichts außerhalb des aktuellen Schritts, wenn es nicht technisch nötig ist.
 
 ## Nächster auszuführender Schritt
-- [ ] i18n-Strategie für Angular festlegen
+- [ ] Accordion- oder Listenkomponente für Tage erstellen

@@ -1,1 +1,22 @@
-<router-outlet />
+<div class="app-shell">
+  <header class="app-topbar">
+    <div class="language-switcher" [attr.aria-label]="copy().common.languageSwitcherLabel">
+      <button
+        type="button"
+        [class.is-active]="languageService.currentLanguage() === 'en'"
+        (click)="languageService.setLanguage('en')"
+      >
+        EN
+      </button>
+      <button
+        type="button"
+        [class.is-active]="languageService.currentLanguage() === 'de'"
+        (click)="languageService.setLanguage('de')"
+      >
+        DE
+      </button>
+    </div>
+  </header>
+
+  <router-outlet />
+</div>

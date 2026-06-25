@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { DayPlan, Trip } from '../models/trip.model';
 import { AuthStateService } from '../services/auth-state.service';
 import { DayPlanService } from '../services/day-plan.service';
+import { LanguageService } from '../services/language.service';
 import { TripService } from '../services/trip.service';
 
 @Component({
@@ -14,14 +15,14 @@ import { TripService } from '../services/trip.service';
   imports: [CommonModule, RouterLink],
   template: `
     <main class="trip-detail-page">
-      <a class="back-link" routerLink="/trips">Back to trips</a>
+      <a class="back-link" routerLink="/trips">{{ copy().tripDetailPage.backToTrips }}</a>
 
       <section *ngIf="accountState() === 'loading' || isLoadingTrip()" class="detail-state">
-        <p>Loading trip...</p>
+        <p>{{ copy().tripDetailPage.loadingTrip }}</p>
       </section>
 
       <section *ngIf="accountState() === 'signed-out'" class="detail-state">
-        <p>Sign in to open this trip.</p>
+        <p>{{ copy().tripDetailPage.signedOut }}</p>
       </section>
 
       <section *ngIf="tripLoadError()" class="detail-state detail-state-error">
@@ -38,29 +39,29 @@ import { TripService } from '../services/trip.service';
 
           <div class="trip-detail-meta">
             <div>
-              <span class="meta-label">Dates</span>
+              <span class="meta-label">{{ copy().tripDetailPage.dates }}</span>
               <strong>{{ currentTrip.startDate }} - {{ currentTrip.endDate }}</strong>
             </div>
             <div>
-              <span class="meta-label">Travelers</span>
+              <span class="meta-label">{{ copy().tripDetailPage.travelers }}</span>
               <strong>{{ currentTrip.peopleCount }}</strong>
             </div>
           </div>
         </header>
 
         <section class="trip-notes" *ngIf="currentTrip.notes">
-          <h2>Notes</h2>
+          <h2>{{ copy().tripDetailPage.notes }}</h2>
           <p>{{ currentTrip.notes }}</p>
         </section>
 
         <section class="day-plan-section">
           <div class="section-heading">
-            <h2>Day plans</h2>
-            <p>Each day of the trip will be listed here.</p>
+            <h2>{{ copy().tripDetailPage.dayPlansTitle }}</h2>
+            <p>{{ copy().tripDetailPage.dayPlansSubtitle }}</p>
           </div>
 
           <div *ngIf="isLoadingDayPlans()" class="detail-state">
-            <p>Loading day plans...</p>
+            <p>{{ copy().tripDetailPage.loadingDayPlans }}</p>
           </div>
 
           <div *ngIf="dayPlanLoadError()" class="detail-state detail-state-error">
@@ -79,15 +80,15 @@ import { TripService } from '../services/trip.service';
 
               <div class="day-plan-grid" *ngIf="dayPlan.mode === 'structured'">
                 <div *ngIf="dayPlan.morningText">
-                  <span class="slot-label">Morning</span>
+                  <span class="slot-label">{{ copy().tripDetailPage.slots.morning }}</span>
                   <p>{{ dayPlan.morningText }}</p>
                 </div>
                 <div *ngIf="dayPlan.middayText">
-                  <span class="slot-label">Midday</span>
+                  <span class="slot-label">{{ copy().tripDetailPage.slots.midday }}</span>
                   <p>{{ dayPlan.middayText }}</p>
                 </div>
                 <div *ngIf="dayPlan.eveningText">
-                  <span class="slot-label">Evening</span>
+                  <span class="slot-label">{{ copy().tripDetailPage.slots.evening }}</span>
                   <p>{{ dayPlan.eveningText }}</p>
                 </div>
               </div>
@@ -95,8 +96,8 @@ import { TripService } from '../services/trip.service';
           </div>
 
           <div *ngIf="!isLoadingDayPlans() && !dayPlanLoadError() && !hasDayPlans()" class="detail-empty">
-            <h3>No day plans yet</h3>
-            <p>This trip exists, but no daily plans have been added yet.</p>
+            <h3>{{ copy().tripDetailPage.emptyTitle }}</h3>
+            <p>{{ copy().tripDetailPage.emptyBody }}</p>
           </div>
         </section>
       </section>
@@ -274,6 +275,7 @@ import { TripService } from '../services/trip.service';
 export class TripDetailPageComponent implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly authStateService = inject(AuthStateService);
+  readonly languageService = inject(LanguageService);
   private readonly tripService = inject(TripService);
   private readonly dayPlanService = inject(DayPlanService);
 
@@ -282,6 +284,7 @@ export class TripDetailPageComponent implements OnDestroy {
   readonly tripId = signal<string | null>(this.route.snapshot.paramMap.get('tripId'));
   readonly trip = signal<Trip | null>(null);
   readonly dayPlans = signal<DayPlan[]>([]);
+  readonly copy = this.languageService.dictionary;
   readonly isLoadingTrip = signal(true);
   readonly isLoadingDayPlans = signal(true);
   readonly tripLoadError = signal<string | null>(null);
@@ -325,7 +328,7 @@ export class TripDetailPageComponent implements OnDestroy {
     this.isLoadingDayPlans.set(true);
 
     if (!tripId) {
-      this.tripLoadError.set('Trip id is missing.');
+      this.tripLoadError.set(this.copy().tripDetailPage.missingTripId);
       this.isLoadingTrip.set(false);
       this.isLoadingDayPlans.set(false);
       return;
@@ -344,7 +347,7 @@ export class TripDetailPageComponent implements OnDestroy {
       const trip = await this.tripService.getTrip(tripId);
 
       if (!trip) {
-        this.tripLoadError.set('Trip not found.');
+        this.tripLoadError.set(this.copy().tripDetailPage.tripNotFound);
         this.isLoadingTrip.set(false);
         this.isLoadingDayPlans.set(false);
         return;
@@ -359,12 +362,14 @@ export class TripDetailPageComponent implements OnDestroy {
           this.isLoadingDayPlans.set(false);
         },
         error: (error) => {
-          this.dayPlanLoadError.set(error instanceof Error ? error.message : 'Failed to load day plans.');
+          this.dayPlanLoadError.set(
+            error instanceof Error ? error.message : this.copy().tripDetailPage.dayPlansLoadFailed
+          );
           this.isLoadingDayPlans.set(false);
         }
       });
     } catch (error) {
-      this.tripLoadError.set(error instanceof Error ? error.message : 'Failed to load trip.');
+      this.tripLoadError.set(error instanceof Error ? error.message : this.copy().tripDetailPage.tripLoadFailed);
       this.isLoadingTrip.set(false);
       this.isLoadingDayPlans.set(false);
     }

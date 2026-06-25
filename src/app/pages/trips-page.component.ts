@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 
 import { Trip } from '../models/trip.model';
 import { AuthStateService } from '../services/auth-state.service';
+import { LanguageService } from '../services/language.service';
 import { TripService } from '../services/trip.service';
 
 @Component({
@@ -17,57 +18,57 @@ import { TripService } from '../services/trip.service';
       <section class="trips-header">
         <div>
           <h1 class="trips-title">Your trips</h1>
-          <p class="trips-subtitle">See all saved vacations and open one to continue planning.</p>
+          <p class="trips-subtitle">{{ copy().tripsPage.subtitle }}</p>
         </div>
       </section>
 
       <section *ngIf="accountState() === 'loading'" class="trips-state">
-        <p>Loading account...</p>
+        <p>{{ copy().tripsPage.loadingAccount }}</p>
       </section>
 
       <section *ngIf="accountState() === 'signed-out'" class="trips-state">
-        <p>Sign in to see your trips.</p>
+        <p>{{ copy().tripsPage.signedOut }}</p>
       </section>
 
       <section *ngIf="accountState() === 'ready'">
         <section class="trip-form-panel">
           <div class="trip-form-header">
             <div>
-              <h2 class="trip-form-title">Create a trip</h2>
-              <p class="trip-form-subtitle">Add the basics first. You can plan each day after that.</p>
+              <h2 class="trip-form-title">{{ copy().tripsPage.createTripTitle }}</h2>
+              <p class="trip-form-subtitle">{{ copy().tripsPage.createTripSubtitle }}</p>
             </div>
           </div>
 
           <form class="trip-form" [formGroup]="tripForm" (ngSubmit)="createTrip()">
             <label class="field">
-              <span>Title</span>
+              <span>{{ copy().tripsPage.fields.title }}</span>
               <input type="text" formControlName="title" />
             </label>
 
             <label class="field">
-              <span>Destination</span>
+              <span>{{ copy().tripsPage.fields.destination }}</span>
               <input type="text" formControlName="destination" />
             </label>
 
             <div class="field-row">
               <label class="field">
-                <span>People</span>
+                <span>{{ copy().tripsPage.fields.people }}</span>
                 <input type="number" min="1" formControlName="peopleCount" />
               </label>
 
               <label class="field">
-                <span>Start date</span>
+                <span>{{ copy().tripsPage.fields.startDate }}</span>
                 <input type="date" formControlName="startDate" />
               </label>
 
               <label class="field">
-                <span>End date</span>
+                <span>{{ copy().tripsPage.fields.endDate }}</span>
                 <input type="date" formControlName="endDate" />
               </label>
             </div>
 
             <label class="field">
-              <span>Notes</span>
+              <span>{{ copy().tripsPage.fields.notes }}</span>
               <textarea rows="4" formControlName="notes"></textarea>
             </label>
 
@@ -77,7 +78,7 @@ import { TripService } from '../services/trip.service';
 
             <div class="trip-form-actions">
               <button type="submit" [disabled]="tripForm.invalid || isCreatingTrip()">
-                {{ isCreatingTrip() ? 'Creating...' : 'Create trip' }}
+                {{ isCreatingTrip() ? copy().tripsPage.createTripSubmitting : copy().tripsPage.createTripSubmit }}
               </button>
             </div>
           </form>
@@ -88,7 +89,7 @@ import { TripService } from '../services/trip.service';
         </div>
 
         <div *ngIf="!loadError() && isLoading()" class="trips-state">
-          <p>Loading trips...</p>
+          <p>{{ copy().tripsPage.loadingTrips }}</p>
         </div>
 
         <div *ngIf="!loadError() && !isLoading() && hasTrips()" class="trips-grid">
@@ -104,14 +105,14 @@ import { TripService } from '../services/trip.service';
             <h2 class="trip-name">{{ trip.title }}</h2>
             <p class="trip-destination" *ngIf="trip.destination">{{ trip.destination }}</p>
             <div class="trip-meta">
-              <span>{{ trip.peopleCount }} travelers</span>
+              <span>{{ trip.peopleCount }} {{ copy().tripsPage.card.travelers }}</span>
             </div>
           </a>
         </div>
 
         <div *ngIf="!loadError() && !isLoading() && !hasTrips()" class="trips-empty">
-          <h2>No trips yet</h2>
-          <p>Create your first trip next.</p>
+          <h2>{{ copy().tripsPage.emptyTitle }}</h2>
+          <p>{{ copy().tripsPage.emptyBody }}</p>
         </div>
       </section>
     </main>
@@ -321,6 +322,8 @@ import { TripService } from '../services/trip.service';
 })
 export class TripsPageComponent implements OnDestroy {
   readonly authStateService = inject(AuthStateService);
+  readonly languageService = inject(LanguageService);
+  readonly copy = this.languageService.dictionary;
 
   private readonly formBuilder = inject(FormBuilder);
   private readonly tripService = inject(TripService);
@@ -370,7 +373,7 @@ export class TripsPageComponent implements OnDestroy {
         this.isLoading.set(false);
       },
       error: (error) => {
-        this.loadError.set(error instanceof Error ? error.message : 'Failed to load trips.');
+        this.loadError.set(error instanceof Error ? error.message : this.copy().tripsPage.errors.loadFailed);
         this.isLoading.set(false);
       }
     });
@@ -391,7 +394,7 @@ export class TripsPageComponent implements OnDestroy {
     const { title, destination, peopleCount, startDate, endDate, notes } = this.tripForm.getRawValue();
 
     if (startDate > endDate) {
-      this.tripFormError.set('End date must be on or after the start date.');
+      this.tripFormError.set(this.copy().tripsPage.validation.invalidDateRange);
       return;
     }
 
@@ -417,7 +420,7 @@ export class TripsPageComponent implements OnDestroy {
         notes: ''
       });
     } catch (error) {
-      this.tripFormError.set(error instanceof Error ? error.message : 'Failed to create trip.');
+      this.tripFormError.set(error instanceof Error ? error.message : this.copy().tripsPage.validation.createFailed);
     } finally {
       this.isCreatingTrip.set(false);
     }

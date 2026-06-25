@@ -1,0 +1,34 @@
+.app-shell {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.app-topbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 20px 0;
+}
+
+.language-switcher {
+  display: inline-flex;
+  border: 1px solid #d9dee7;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.language-switcher button {
+  border: 0;
+  background: transparent;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #4b5563;
+}
+
+.language-switcher button.is-active {
+  background: #111827;
+  color: #fff;
+}
