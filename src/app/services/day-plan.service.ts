@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
+  CollectionReference,
   QueryDocumentSnapshot,
   addDoc,
   collection,
@@ -28,7 +29,7 @@ export type UpdateDayPlanInput = Partial<Omit<DayPlanDocument, 'ownerId' | 'trip
   providedIn: 'root'
 })
 export class DayPlanService {
-  private readonly dayPlansCollection = collection(db, 'dayPlans');
+  private readonly dayPlansCollection = collection(db, 'dayPlans') as CollectionReference<DayPlanDocument>;
 
   constructor(private readonly authStateService: AuthStateService) {}
 

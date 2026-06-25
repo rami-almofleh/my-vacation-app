@@ -1,0 +1,425 @@
+import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, computed, effect, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
+
+import { Trip } from '../models/trip.model';
+import { AuthStateService } from '../services/auth-state.service';
+import { TripService } from '../services/trip.service';
+
+@Component({
+  selector: 'app-trips-page',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  template: `
+    <main class="trips-page">
+      <section class="trips-header">
+        <div>
+          <h1 class="trips-title">Your trips</h1>
+          <p class="trips-subtitle">See all saved vacations and open one to continue planning.</p>
+        </div>
+      </section>
+
+      <section *ngIf="accountState() === 'loading'" class="trips-state">
+        <p>Loading account...</p>
+      </section>
+
+      <section *ngIf="accountState() === 'signed-out'" class="trips-state">
+        <p>Sign in to see your trips.</p>
+      </section>
+
+      <section *ngIf="accountState() === 'ready'">
+        <section class="trip-form-panel">
+          <div class="trip-form-header">
+            <div>
+              <h2 class="trip-form-title">Create a trip</h2>
+              <p class="trip-form-subtitle">Add the basics first. You can plan each day after that.</p>
+            </div>
+          </div>
+
+          <form class="trip-form" [formGroup]="tripForm" (ngSubmit)="createTrip()">
+            <label class="field">
+              <span>Title</span>
+              <input type="text" formControlName="title" />
+            </label>
+
+            <label class="field">
+              <span>Destination</span>
+              <input type="text" formControlName="destination" />
+            </label>
+
+            <div class="field-row">
+              <label class="field">
+                <span>People</span>
+                <input type="number" min="1" formControlName="peopleCount" />
+              </label>
+
+              <label class="field">
+                <span>Start date</span>
+                <input type="date" formControlName="startDate" />
+              </label>
+
+              <label class="field">
+                <span>End date</span>
+                <input type="date" formControlName="endDate" />
+              </label>
+            </div>
+
+            <label class="field">
+              <span>Notes</span>
+              <textarea rows="4" formControlName="notes"></textarea>
+            </label>
+
+            <div *ngIf="tripFormError()" class="trip-form-error">
+              <p>{{ tripFormError() }}</p>
+            </div>
+
+            <div class="trip-form-actions">
+              <button type="submit" [disabled]="tripForm.invalid || isCreatingTrip()">
+                {{ isCreatingTrip() ? 'Creating...' : 'Create trip' }}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <div *ngIf="loadError()" class="trips-state trips-state-error">
+          <p>{{ loadError() }}</p>
+        </div>
+
+        <div *ngIf="!loadError() && isLoading()" class="trips-state">
+          <p>Loading trips...</p>
+        </div>
+
+        <div *ngIf="!loadError() && !isLoading() && hasTrips()" class="trips-grid">
+          <a
+            *ngFor="let trip of trips()"
+            class="trip-card"
+            [routerLink]="['/trips', trip.id]"
+          >
+            <div class="trip-card-top">
+              <span class="trip-year">{{ trip.year }}</span>
+              <span class="trip-dates">{{ trip.startDate }} - {{ trip.endDate }}</span>
+            </div>
+            <h2 class="trip-name">{{ trip.title }}</h2>
+            <p class="trip-destination" *ngIf="trip.destination">{{ trip.destination }}</p>
+            <div class="trip-meta">
+              <span>{{ trip.peopleCount }} travelers</span>
+            </div>
+          </a>
+        </div>
+
+        <div *ngIf="!loadError() && !isLoading() && !hasTrips()" class="trips-empty">
+          <h2>No trips yet</h2>
+          <p>Create your first trip next.</p>
+        </div>
+      </section>
+    </main>
+  `,
+  styles: [`
+    .trips-page {
+      min-height: 100vh;
+      padding: 32px 20px 48px;
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    .trips-header {
+      margin-bottom: 24px;
+    }
+
+    .trip-form-panel,
+    .trips-state,
+    .trips-empty {
+      border: 1px solid #d9dee7;
+      border-radius: 8px;
+      padding: 20px;
+      background: #fff;
+    }
+
+    .trip-form-panel {
+      margin-bottom: 24px;
+    }
+
+    .trip-form-header {
+      margin-bottom: 16px;
+    }
+
+    .trip-form-title {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .trip-form-subtitle {
+      margin: 8px 0 0;
+      color: #5b6472;
+    }
+
+    .trips-title {
+      margin: 0;
+      font-size: 2rem;
+      line-height: 1.1;
+    }
+
+    .trips-subtitle {
+      margin: 8px 0 0;
+      color: #5b6472;
+      max-width: 640px;
+    }
+
+    .trip-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field span {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      border: 1px solid #c8d1dc;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font: inherit;
+      background: #fff;
+      color: #111827;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      outline: 2px solid #cfe0ff;
+      border-color: #7aa2f7;
+    }
+
+    .trip-form-actions {
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .trip-form-actions button {
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 18px;
+      background: #111827;
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .trip-form-actions button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .trip-form-error {
+      border: 1px solid #f0b6b6;
+      border-radius: 8px;
+      padding: 12px 14px;
+      background: #fff5f5;
+      color: #8a2424;
+    }
+
+    .trips-state-error {
+      border-color: #f0b6b6;
+      color: #8a2424;
+      margin-bottom: 16px;
+    }
+
+    .trips-empty h2 {
+      margin: 0 0 8px;
+      font-size: 1.25rem;
+    }
+
+    .trips-empty p,
+    .trips-state p {
+      margin: 0;
+    }
+
+    .trips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .trip-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 180px;
+      padding: 18px;
+      border: 1px solid #d9dee7;
+      border-radius: 8px;
+      text-decoration: none;
+      color: inherit;
+      background: #fff;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    }
+
+    .trip-card:hover {
+      border-color: #b7c2d0;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .trip-card-top {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .trip-year {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #4b5563;
+    }
+
+    .trip-dates,
+    .trip-destination,
+    .trip-meta {
+      color: #5b6472;
+      font-size: 0.95rem;
+    }
+
+    .trip-name {
+      margin: 0;
+      font-size: 1.25rem;
+      line-height: 1.2;
+    }
+
+    @media (max-width: 640px) {
+      .trips-page {
+        padding: 20px 16px 32px;
+      }
+
+      .trips-title {
+        font-size: 1.6rem;
+      }
+
+      .field-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  `]
+})
+export class TripsPageComponent implements OnDestroy {
+  readonly authStateService = inject(AuthStateService);
+
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly tripService = inject(TripService);
+  private tripSubscription?: Subscription;
+
+  readonly trips = signal<Trip[]>([]);
+  readonly isLoading = signal(true);
+  readonly loadError = signal<string | null>(null);
+  readonly isCreatingTrip = signal(false);
+  readonly tripFormError = signal<string | null>(null);
+  readonly hasTrips = computed(() => this.trips().length > 0);
+  readonly accountState = computed<'loading' | 'signed-out' | 'ready'>(() => {
+    if (!this.authStateService.isReady()) {
+      return 'loading';
+    }
+
+    return this.authStateService.currentUser() ? 'ready' : 'signed-out';
+  });
+  readonly tripForm = this.formBuilder.nonNullable.group({
+    title: ['', [Validators.required, Validators.maxLength(80)]],
+    destination: ['', [Validators.maxLength(80)]],
+    peopleCount: [1, [Validators.required, Validators.min(1)]],
+    startDate: ['', Validators.required],
+    endDate: ['', Validators.required],
+    notes: ['', [Validators.maxLength(500)]]
+  });
+  
+  private readonly watchTripsEffect = effect(() => {
+    this.tripSubscription?.unsubscribe();
+    this.trips.set([]);
+    this.loadError.set(null);
+
+    if (!this.authStateService.isReady()) {
+      this.isLoading.set(true);
+      return;
+    }
+
+    if (!this.authStateService.currentUser()) {
+      this.isLoading.set(false);
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.tripSubscription = this.tripService.watchTrips().subscribe({
+      next: (trips) => {
+        this.trips.set(trips);
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        this.loadError.set(error instanceof Error ? error.message : 'Failed to load trips.');
+        this.isLoading.set(false);
+      }
+    });
+  });
+
+  ngOnDestroy(): void {
+    this.tripSubscription?.unsubscribe();
+  }
+
+  async createTrip(): Promise<void> {
+    this.tripFormError.set(null);
+
+    if (this.tripForm.invalid) {
+      this.tripForm.markAllAsTouched();
+      return;
+    }
+
+    const { title, destination, peopleCount, startDate, endDate, notes } = this.tripForm.getRawValue();
+
+    if (startDate > endDate) {
+      this.tripFormError.set('End date must be on or after the start date.');
+      return;
+    }
+
+    this.isCreatingTrip.set(true);
+
+    try {
+      await this.tripService.createTrip({
+        title: title.trim(),
+        destination: destination.trim() || undefined,
+        year: Number(startDate.slice(0, 4)),
+        peopleCount,
+        startDate,
+        endDate,
+        notes: notes.trim() || undefined
+      });
+
+      this.tripForm.reset({
+        title: '',
+        destination: '',
+        peopleCount: 1,
+        startDate: '',
+        endDate: '',
+        notes: ''
+      });
+    } catch (error) {
+      this.tripFormError.set(error instanceof Error ? error.message : 'Failed to create trip.');
+    } finally {
+      this.isCreatingTrip.set(false);
+    }
+  }
+}

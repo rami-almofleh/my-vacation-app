@@ -348,11 +348,11 @@ Für den MVP wird Firebase Authentication mit `email/password` verwendet.
 - [x] `DayPlanService` für CRUD auf Tagespläne implementieren
 
 ### Phase 2: Hauptnavigation und Basis-Views
-- [ ] App-Routing für Urlaubsübersicht und Detailansicht anlegen
-- [ ] Startseite mit Liste aller Urlaube erstellen
-- [ ] Formular zum Anlegen eines neuen Urlaubs erstellen
-- [ ] Urlaub-Detailseite mit Tagesliste anlegen
-- [ ] Leere Zustände und Ladezustände ergänzen
+- [x] App-Routing für Urlaubsübersicht und Detailansicht anlegen
+- [x] Startseite mit Liste aller Urlaube erstellen
+- [x] Formular zum Anlegen eines neuen Urlaubs erstellen
+- [x] Urlaub-Detailseite mit Tagesliste anlegen
+- [x] Leere Zustände und Ladezustände ergänzen
 
 ### Phase 2.5: Sprache und Übersetzungen
 - [ ] i18n-Strategie für Angular festlegen
@@ -397,4 +397,4 @@ Für den MVP wird Firebase Authentication mit `email/password` verwendet.
 6. Ändere nichts außerhalb des aktuellen Schritts, wenn es nicht technisch nötig ist.
 
 ## Nächster auszuführender Schritt
-- [ ] App-Routing für Urlaubsübersicht und Detailansicht anlegen
+- [ ] i18n-Strategie für Angular festlegen
