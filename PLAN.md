@@ -344,8 +344,8 @@ Für den MVP wird Firebase Authentication mit `email/password` verwendet.
 - [x] Firestore Rules für benutzerbezogenen Zugriff definieren
 
 ### Phase 1.6: Services
-- [ ] `TripService` für CRUD auf Urlaube implementieren
-- [ ] `DayPlanService` für CRUD auf Tagespläne implementieren
+- [x] `TripService` für CRUD auf Urlaube implementieren
+- [x] `DayPlanService` für CRUD auf Tagespläne implementieren
 
 ### Phase 2: Hauptnavigation und Basis-Views
 - [ ] App-Routing für Urlaubsübersicht und Detailansicht anlegen
@@ -397,4 +397,4 @@ Für den MVP wird Firebase Authentication mit `email/password` verwendet.
 6. Ändere nichts außerhalb des aktuellen Schritts, wenn es nicht technisch nötig ist.
 
 ## Nächster auszuführender Schritt
-- [ ] `TripService` für CRUD auf Urlaube implementieren
+- [ ] App-Routing für Urlaubsübersicht und Detailansicht anlegen
