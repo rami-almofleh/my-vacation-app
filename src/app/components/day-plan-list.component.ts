@@ -12,7 +12,11 @@ import { LanguageService } from '../services/language.service';
   imports: [CommonModule, ReactiveFormsModule],
   template: `
     <div class="day-plan-list">
-      <details *ngFor="let dayPlan of dayPlans()" class="day-plan-item">
+      <details
+        *ngFor="let dayPlan of dayPlans()"
+        class="day-plan-item"
+        [attr.id]="getDayPlanElementId(dayPlan.date)"
+      >
         <summary class="day-plan-summary-row">
           <div class="day-plan-summary-main">
             <strong>{{ dayPlan.date }}</strong>
@@ -477,6 +481,10 @@ export class DayPlanListComponent {
 
   getDayKey(dayPlan: DayPlan): string {
     return dayPlan.id ?? dayPlan.date;
+  }
+
+  getDayPlanElementId(date: string): string {
+    return `day-plan-${date}`;
   }
 
   isEditingDay(dayPlan: DayPlan): boolean {

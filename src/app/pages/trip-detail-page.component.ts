@@ -81,9 +81,14 @@ import { createTripDays } from '../utils/trip-days';
             <div class="overview-list">
               <h3>{{ copy().tripDetailPage.overviewLists.empty }}</h3>
               <div *ngIf="emptyDayPlans().length; else noEmptyDays" class="overview-chip-list">
-                <span *ngFor="let dayPlan of emptyDayPlans()" class="overview-chip">
+                <button
+                  *ngFor="let dayPlan of emptyDayPlans()"
+                  type="button"
+                  class="overview-chip"
+                  (click)="scrollToDayPlan(dayPlan.date)"
+                >
                   {{ dayPlan.date }}
-                </span>
+                </button>
               </div>
               <ng-template #noEmptyDays>
                 <p class="overview-empty">{{ copy().tripDetailPage.overviewLists.none }}</p>
@@ -93,9 +98,14 @@ import { createTripDays } from '../utils/trip-days';
             <div class="overview-list">
               <h3>{{ copy().tripDetailPage.overviewLists.partial }}</h3>
               <div *ngIf="partialDayPlans().length; else noPartialDays" class="overview-chip-list">
-                <span *ngFor="let dayPlan of partialDayPlans()" class="overview-chip">
+                <button
+                  *ngFor="let dayPlan of partialDayPlans()"
+                  type="button"
+                  class="overview-chip"
+                  (click)="scrollToDayPlan(dayPlan.date)"
+                >
                   {{ dayPlan.date }}
-                </span>
+                </button>
               </div>
               <ng-template #noPartialDays>
                 <p class="overview-empty">{{ copy().tripDetailPage.overviewLists.none }}</p>
@@ -289,12 +299,25 @@ import { createTripDays } from '../utils/trip-days';
     }
 
     .overview-chip {
+      border: 0;
       border-radius: 999px;
       background: #eef2f7;
       color: #4b5563;
       padding: 6px 10px;
       font-size: 0.85rem;
       font-weight: 600;
+      cursor: pointer;
+      transition: background-color 160ms ease, color 160ms ease;
+    }
+
+    .overview-chip:hover {
+      background: #dbe5f0;
+      color: #1f2937;
+    }
+
+    .overview-chip:focus-visible {
+      outline: 2px solid #1d4ed8;
+      outline-offset: 2px;
     }
 
     .overview-empty {
@@ -408,6 +431,17 @@ export class TripDetailPageComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.routeSubscription.unsubscribe();
     this.dayPlanSubscription?.unsubscribe();
+  }
+
+  scrollToDayPlan(date: string): void {
+    const targetElement = document.getElementById(`day-plan-${date}`);
+
+    if (!(targetElement instanceof HTMLDetailsElement)) {
+      return;
+    }
+
+    targetElement.open = true;
+    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   private async loadTrip(tripId: string): Promise<void> {
