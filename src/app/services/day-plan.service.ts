@@ -8,6 +8,7 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
   onSnapshot,
   query,
   updateDoc,
@@ -134,6 +135,18 @@ export class DayPlanService {
     }
 
     await deleteDoc(doc(this.dayPlansCollection, dayPlanId));
+  }
+
+  async deleteDayPlansForTrip(tripId: string): Promise<void> {
+    const ownerId = this.authStateService.getRequiredUserId();
+    const dayPlansQuery = query(
+      this.dayPlansCollection,
+      where('ownerId', '==', ownerId),
+      where('tripId', '==', tripId)
+    );
+    const snapshot = await getDocs(dayPlansQuery);
+
+    await Promise.all(snapshot.docs.map((dayPlanDocument) => deleteDoc(dayPlanDocument.ref)));
   }
 
   private mapDayPlanDocument(dayPlanDocument: QueryDocumentSnapshot<DayPlanDocument>): DayPlan {

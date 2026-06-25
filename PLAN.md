@@ -384,7 +384,7 @@ Für dieses Projekt wird eine runtime-basierte Übersetzungsstrategie verwendet.
 - [x] Bestehende und neue UI-Texte nur noch über Übersetzungskeys ausgeben
 
 ### Phase 3: Tagesplanung
-- [ ] Accordion- oder Listenkomponente für Tage erstellen
+- [x] Accordion- oder Listenkomponente für Tage erstellen
 - [ ] Tagesstatus `empty`, `partial`, `planned` berechnen
 - [ ] Editor für einfachen Tagesmodus mit Freitext bauen
 - [ ] Editor für strukturierten Tagesmodus mit morgens / mittags / abends bauen
@@ -420,4 +420,4 @@ Für dieses Projekt wird eine runtime-basierte Übersetzungsstrategie verwendet.
 6. Ändere nichts außerhalb des aktuellen Schritts, wenn es nicht technisch nötig ist.
 
 ## Nächster auszuführender Schritt
-- [ ] Accordion- oder Listenkomponente für Tage erstellen
+- [ ] Tagesstatus `empty`, `partial`, `planned` berechnen

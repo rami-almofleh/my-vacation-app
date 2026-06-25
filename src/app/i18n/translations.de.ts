@@ -50,7 +50,13 @@ export const translationsDe: TranslationDictionary = {
       authFailed: 'Die Anmeldung konnte nicht verarbeitet werden.'
     },
     errors: {
-      loadFailed: 'Urlaube konnten nicht geladen werden.'
+      loadFailed: 'Urlaube konnten nicht geladen werden.',
+      deleteFailed: 'Der Urlaub konnte nicht geloescht werden.'
+    },
+    actions: {
+      delete: 'Loeschen',
+      deleting: 'Wird geloescht...',
+      deleteConfirm: 'Diesen Urlaub und alle Tagesplaene dazu loeschen?'
     },
     card: {
       travelers: 'Reisende'

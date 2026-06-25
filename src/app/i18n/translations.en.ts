@@ -50,7 +50,13 @@ export const translationsEn: TranslationDictionary = {
       authFailed: 'Authentication request failed.'
     },
     errors: {
-      loadFailed: 'Failed to load trips.'
+      loadFailed: 'Failed to load trips.',
+      deleteFailed: 'Failed to delete trip.'
+    },
+    actions: {
+      delete: 'Delete',
+      deleting: 'Deleting...',
+      deleteConfirm: 'Delete this trip and all of its day plans?'
     },
     card: {
       travelers: 'travelers'

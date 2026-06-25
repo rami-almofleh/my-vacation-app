@@ -51,6 +51,12 @@ export interface TranslationDictionary {
     };
     errors: {
       loadFailed: string;
+      deleteFailed: string;
+    };
+    actions: {
+      delete: string;
+      deleting: string;
+      deleteConfirm: string;
     };
     card: {
       travelers: string;

@@ -3,6 +3,7 @@ import { Component, OnDestroy, computed, effect, inject, signal } from '@angular
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 
+import { DayPlanListComponent } from '../components/day-plan-list.component';
 import { DayPlan, Trip } from '../models/trip.model';
 import { AuthStateService } from '../services/auth-state.service';
 import { DayPlanService } from '../services/day-plan.service';
@@ -12,7 +13,7 @@ import { TripService } from '../services/trip.service';
 @Component({
   selector: 'app-trip-detail-page',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, DayPlanListComponent],
   template: `
     <main class="trip-detail-page">
       <a class="back-link" routerLink="/trips">{{ copy().tripDetailPage.backToTrips }}</a>
@@ -68,32 +69,10 @@ import { TripService } from '../services/trip.service';
             <p>{{ dayPlanLoadError() }}</p>
           </div>
 
-          <div *ngIf="!isLoadingDayPlans() && !dayPlanLoadError() && hasDayPlans()" class="day-plan-list">
-            <article *ngFor="let dayPlan of dayPlans()" class="day-plan-card">
-              <div class="day-plan-top">
-                <strong>{{ dayPlan.date }}</strong>
-                <span class="day-plan-status">{{ dayPlan.status }}</span>
-              </div>
-
-              <h3 *ngIf="dayPlan.title" class="day-plan-title">{{ dayPlan.title }}</h3>
-              <p *ngIf="dayPlan.summaryText" class="day-plan-summary">{{ dayPlan.summaryText }}</p>
-
-              <div class="day-plan-grid" *ngIf="dayPlan.mode === 'structured'">
-                <div *ngIf="dayPlan.morningText">
-                  <span class="slot-label">{{ copy().tripDetailPage.slots.morning }}</span>
-                  <p>{{ dayPlan.morningText }}</p>
-                </div>
-                <div *ngIf="dayPlan.middayText">
-                  <span class="slot-label">{{ copy().tripDetailPage.slots.midday }}</span>
-                  <p>{{ dayPlan.middayText }}</p>
-                </div>
-                <div *ngIf="dayPlan.eveningText">
-                  <span class="slot-label">{{ copy().tripDetailPage.slots.evening }}</span>
-                  <p>{{ dayPlan.eveningText }}</p>
-                </div>
-              </div>
-            </article>
-          </div>
+          <app-day-plan-list
+            *ngIf="!isLoadingDayPlans() && !dayPlanLoadError() && hasDayPlans()"
+            [dayPlans]="dayPlans()"
+          />
 
           <div *ngIf="!isLoadingDayPlans() && !dayPlanLoadError() && !hasDayPlans()" class="detail-empty">
             <h3>{{ copy().tripDetailPage.emptyTitle }}</h3>
@@ -128,8 +107,7 @@ import { TripService } from '../services/trip.service';
     .trip-detail-header,
     .trip-notes,
     .detail-state,
-    .detail-empty,
-    .day-plan-card {
+    .detail-empty {
       border: 1px solid #d9dee7;
       border-radius: 8px;
       background: #fff;
@@ -202,57 +180,6 @@ import { TripService } from '../services/trip.service';
       gap: 16px;
     }
 
-    .day-plan-list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .day-plan-card {
-      padding: 18px;
-    }
-
-    .day-plan-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .day-plan-status {
-      color: #5b6472;
-      text-transform: capitalize;
-    }
-
-    .day-plan-title {
-      margin: 0 0 8px;
-      font-size: 1.1rem;
-    }
-
-    .day-plan-summary {
-      margin: 0 0 12px;
-      color: #374151;
-    }
-
-    .day-plan-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .slot-label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #5b6472;
-    }
-
-    .day-plan-grid p {
-      margin: 0;
-      color: #374151;
-    }
-
     @media (max-width: 720px) {
       .trip-detail-page {
         padding: 20px 16px 32px;
@@ -264,10 +191,6 @@ import { TripService } from '../services/trip.service';
 
       .trip-detail-title {
         font-size: 1.7rem;
-      }
-
-      .day-plan-grid {
-        grid-template-columns: 1fr;
       }
     }
   `]

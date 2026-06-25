@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 
 import { Trip } from '../models/trip.model';
 import { AuthStateService } from '../services/auth-state.service';
+import { DayPlanService } from '../services/day-plan.service';
 import { LanguageService } from '../services/language.service';
 import { TripService } from '../services/trip.service';
 
@@ -97,16 +98,17 @@ import { TripService } from '../services/trip.service';
       </section>
 
       <section *ngIf="accountState() === 'ready'">
-        <section class="trip-form-panel">
+        <section class="trip-toolbar">
+          <button type="button" class="secondary-button" (click)="signOut()">
+            {{ copy().tripsPage.auth.signOut }}
+          </button>
+        </section>
+
+        <section *ngIf="!hasTrips()" class="trip-form-panel">
           <div class="trip-form-header">
             <div>
               <h2 class="trip-form-title">{{ copy().tripsPage.createTripTitle }}</h2>
               <p class="trip-form-subtitle">{{ copy().tripsPage.createTripSubtitle }}</p>
-            </div>
-            <div class="trip-form-actions">
-              <button type="button" class="secondary-button" (click)="signOut()">
-                {{ copy().tripsPage.auth.signOut }}
-              </button>
             </div>
           </div>
 
@@ -159,26 +161,46 @@ import { TripService } from '../services/trip.service';
           <p>{{ loadError() }}</p>
         </div>
 
+        <div *ngIf="hasTrips() && tripFormError()" class="trips-state trips-state-error">
+          <p>{{ tripFormError() }}</p>
+        </div>
+
         <div *ngIf="!loadError() && isLoading()" class="trips-state">
           <p>{{ copy().tripsPage.loadingTrips }}</p>
         </div>
 
         <div *ngIf="!loadError() && !isLoading() && hasTrips()" class="trips-grid">
-          <a
+          <article
             *ngFor="let trip of trips()"
             class="trip-card"
-            [routerLink]="['/trips', trip.id]"
           >
-            <div class="trip-card-top">
-              <span class="trip-year">{{ trip.year }}</span>
-              <span class="trip-dates">{{ trip.startDate }} - {{ trip.endDate }}</span>
+            <a class="trip-card-link" [routerLink]="['/trips', trip.id]">
+              <div class="trip-card-top">
+                <span class="trip-year">{{ trip.year }}</span>
+                <span class="trip-dates">{{ trip.startDate }} - {{ trip.endDate }}</span>
+              </div>
+              <h2 class="trip-name">{{ trip.title }}</h2>
+              <p class="trip-destination" *ngIf="trip.destination">{{ trip.destination }}</p>
+              <div class="trip-meta">
+                <span>{{ trip.peopleCount }} {{ copy().tripsPage.card.travelers }}</span>
+              </div>
+            </a>
+
+            <div class="trip-card-actions">
+              <button
+                type="button"
+                class="danger-button"
+                [disabled]="deletingTripId() === trip.id"
+                (click)="deleteTrip(trip)"
+              >
+                {{
+                  deletingTripId() === trip.id
+                    ? copy().tripsPage.actions.deleting
+                    : copy().tripsPage.actions.delete
+                }}
+              </button>
             </div>
-            <h2 class="trip-name">{{ trip.title }}</h2>
-            <p class="trip-destination" *ngIf="trip.destination">{{ trip.destination }}</p>
-            <div class="trip-meta">
-              <span>{{ trip.peopleCount }} {{ copy().tripsPage.card.travelers }}</span>
-            </div>
-          </a>
+          </article>
         </div>
 
         <div *ngIf="!loadError() && !isLoading() && !hasTrips()" class="trips-empty">
@@ -210,6 +232,12 @@ import { TripService } from '../services/trip.service';
     }
 
     .trip-form-panel {
+      margin-bottom: 24px;
+    }
+
+    .trip-toolbar {
+      display: flex;
+      justify-content: flex-end;
       margin-bottom: 24px;
     }
 
@@ -404,21 +432,51 @@ import { TripService } from '../services/trip.service';
     .trip-card {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      justify-content: space-between;
       min-height: 180px;
-      padding: 18px;
       border: 1px solid #d9dee7;
       border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .trip-card-link {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 12px;
+      padding: 18px;
       text-decoration: none;
       color: inherit;
-      background: #fff;
       transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
     }
 
-    .trip-card:hover {
+    .trip-card-link:hover {
       border-color: #b7c2d0;
       box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
       transform: translateY(-1px);
+    }
+
+    .trip-card-actions {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 18px 18px;
+    }
+
+    .danger-button {
+      border: 1px solid #e2b8b8;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: #fff5f5;
+      color: #8a2424;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .danger-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .trip-card-top {
@@ -468,12 +526,14 @@ export class TripsPageComponent implements OnDestroy {
 
   private readonly formBuilder = inject(FormBuilder);
   private readonly tripService = inject(TripService);
+  private readonly dayPlanService = inject(DayPlanService);
   private tripSubscription?: Subscription;
 
   readonly trips = signal<Trip[]>([]);
   readonly isLoading = signal(true);
   readonly loadError = signal<string | null>(null);
   readonly isCreatingTrip = signal(false);
+  readonly deletingTripId = signal<string | null>(null);
   readonly tripFormError = signal<string | null>(null);
   readonly authMode = signal<'sign-in' | 'sign-up'>('sign-in');
   readonly showPassword = signal(false);
@@ -619,6 +679,31 @@ export class TripsPageComponent implements OnDestroy {
       this.tripFormError.set(error instanceof Error ? error.message : this.copy().tripsPage.validation.createFailed);
     } finally {
       this.isCreatingTrip.set(false);
+    }
+  }
+
+  async deleteTrip(trip: Trip): Promise<void> {
+    if (!trip.id) {
+      return;
+    }
+
+    this.tripFormError.set(null);
+
+    if (!window.confirm(this.copy().tripsPage.actions.deleteConfirm)) {
+      return;
+    }
+
+    this.deletingTripId.set(trip.id);
+
+    try {
+      await this.dayPlanService.deleteDayPlansForTrip(trip.id);
+      await this.tripService.deleteTrip(trip.id);
+    } catch (error) {
+      this.tripFormError.set(
+        error instanceof Error ? error.message : this.copy().tripsPage.errors.deleteFailed
+      );
+    } finally {
+      this.deletingTripId.set(null);
     }
   }
 }
