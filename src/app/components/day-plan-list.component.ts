@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, input, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { DayPlan } from '../models/trip.model';
+import { DayCategory, DayPlan } from '../models/trip.model';
 import { DayPlanService } from '../services/day-plan.service';
 import { LanguageService } from '../services/language.service';
 
@@ -26,6 +26,12 @@ import { LanguageService } from '../services/language.service';
         <div class="day-plan-body">
           <h3 *ngIf="dayPlan.title" class="day-plan-title">{{ dayPlan.title }}</h3>
           <p *ngIf="dayPlan.summaryText" class="day-plan-text">{{ dayPlan.summaryText }}</p>
+
+          <div *ngIf="dayPlan.categories?.length" class="category-chip-list">
+            <span *ngFor="let category of dayPlan.categories" class="category-chip">
+              {{ getCategoryLabel(category) }}
+            </span>
+          </div>
 
           <div *ngIf="dayPlan.mode === 'simple'" class="simple-editor">
             <div class="simple-editor-header">
@@ -60,6 +66,20 @@ import { LanguageService } from '../services/language.service';
                 formControlName="summaryText"
                 [attr.placeholder]="copy().tripDetailPage.simpleEditorPlaceholder"
               ></textarea>
+
+              <div class="category-editor">
+                <span class="slot-label">{{ copy().tripDetailPage.categoriesTitle }}</span>
+                <div class="category-option-list">
+                  <label *ngFor="let category of categoryOptions" class="category-option">
+                    <input
+                      type="checkbox"
+                      [checked]="hasSelectedCategory(category)"
+                      (change)="toggleCategory(category)"
+                    />
+                    <span>{{ getCategoryLabel(category) }}</span>
+                  </label>
+                </div>
+              </div>
 
               <div *ngIf="simpleEditorError()" class="simple-editor-error">
                 {{ simpleEditorError() }}
@@ -140,6 +160,20 @@ import { LanguageService } from '../services/language.service';
               <span class="slot-label">{{ copy().tripDetailPage.slots.evening }}</span>
               <textarea rows="3" formControlName="eveningText"></textarea>
             </label>
+
+            <div class="category-editor">
+              <span class="slot-label">{{ copy().tripDetailPage.categoriesTitle }}</span>
+              <div class="category-option-list">
+                <label *ngFor="let category of categoryOptions" class="category-option">
+                  <input
+                    type="checkbox"
+                    [checked]="hasSelectedCategory(category)"
+                    (change)="toggleCategory(category)"
+                  />
+                  <span>{{ getCategoryLabel(category) }}</span>
+                </label>
+              </div>
+            </div>
 
             <div *ngIf="structuredEditorError()" class="simple-editor-error">
               {{ structuredEditorError() }}
@@ -238,6 +272,22 @@ import { LanguageService } from '../services/language.service';
       color: #374151;
     }
 
+    .category-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .category-chip {
+      border-radius: 999px;
+      background: #eef2f7;
+      color: #4b5563;
+      padding: 5px 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
     .simple-editor {
       margin-top: 12px;
     }
@@ -312,6 +362,30 @@ import { LanguageService } from '../services/language.service';
       gap: 6px;
     }
 
+    .category-editor {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .category-option-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .category-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #d9dee7;
+      border-radius: 999px;
+      background: #fff;
+      color: #374151;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+    }
+
     .simple-editor-error {
       border: 1px solid #f0b6b6;
       border-radius: 8px;
@@ -350,11 +424,13 @@ export class DayPlanListComponent {
   private readonly dayPlanService = inject(DayPlanService);
   readonly copy = this.languageService.dictionary;
   readonly dayPlans = input.required<DayPlan[]>();
+  readonly categoryOptions: DayCategory[] = ['food', 'outing', 'shopping', 'relax', 'transport', 'other'];
   readonly editingDayKey = signal<string | null>(null);
   readonly savingDayKey = signal<string | null>(null);
   readonly editMode = signal<'simple' | 'structured'>('simple');
   readonly simpleEditorError = signal<string | null>(null);
   readonly structuredEditorError = signal<string | null>(null);
+  readonly selectedCategories = signal<DayCategory[]>([]);
   readonly simpleEditorForm = this.formBuilder.nonNullable.group({
     summaryText: ['', [Validators.maxLength(500)]]
   });
@@ -379,11 +455,28 @@ export class DayPlanListComponent {
     return dayPlan.id ?? dayPlan.date;
   }
 
+  getCategoryLabel(category: DayCategory): string {
+    return this.copy().tripDetailPage.categories[category];
+  }
+
+  hasSelectedCategory(category: DayCategory): boolean {
+    return this.selectedCategories().includes(category);
+  }
+
+  toggleCategory(category: DayCategory): void {
+    this.selectedCategories.update((currentCategories) =>
+      currentCategories.includes(category)
+        ? currentCategories.filter((entry) => entry !== category)
+        : [...currentCategories, category]
+    );
+  }
+
   openSimpleEditor(dayPlan: DayPlan): void {
     this.simpleEditorError.set(null);
     this.structuredEditorError.set(null);
     this.editMode.set('simple');
     this.editingDayKey.set(this.getDayKey(dayPlan));
+    this.selectedCategories.set(dayPlan.categories ?? []);
     this.simpleEditorForm.reset({
       summaryText: dayPlan.summaryText ?? ''
     });
@@ -395,6 +488,7 @@ export class DayPlanListComponent {
     this.editMode.set('simple');
     this.simpleEditorError.set(null);
     this.structuredEditorError.set(null);
+    this.selectedCategories.set([]);
     this.simpleEditorForm.reset({
       summaryText: ''
     });
@@ -410,6 +504,7 @@ export class DayPlanListComponent {
     this.structuredEditorError.set(null);
     this.editMode.set('structured');
     this.editingDayKey.set(this.getDayKey(dayPlan));
+    this.selectedCategories.set(dayPlan.categories ?? []);
     this.structuredEditorForm.reset({
       morningText: dayPlan.morningText ?? '',
       middayText: dayPlan.middayText ?? '',
@@ -440,7 +535,8 @@ export class DayPlanListComponent {
           summaryText,
           morningText: '',
           middayText: '',
-          eveningText: ''
+          eveningText: '',
+          categories: this.selectedCategories()
         });
       } else {
         await this.dayPlanService.createDayPlan({
@@ -452,7 +548,7 @@ export class DayPlanListComponent {
           morningText: '',
           middayText: '',
           eveningText: '',
-          categories: dayPlan.categories ?? [],
+          categories: this.selectedCategories(),
           locationHint: dayPlan.locationHint,
           status: dayPlan.status,
           copiedFromDayId: dayPlan.copiedFromDayId
@@ -490,7 +586,8 @@ export class DayPlanListComponent {
           summaryText: '',
           morningText: trimmedMorningText,
           middayText: trimmedMiddayText,
-          eveningText: trimmedEveningText
+          eveningText: trimmedEveningText,
+          categories: this.selectedCategories()
         });
       } else {
         await this.dayPlanService.createDayPlan({
@@ -502,7 +599,7 @@ export class DayPlanListComponent {
           morningText: trimmedMorningText,
           middayText: trimmedMiddayText,
           eveningText: trimmedEveningText,
-          categories: dayPlan.categories ?? [],
+          categories: this.selectedCategories(),
           locationHint: dayPlan.locationHint,
           status: dayPlan.status,
           copiedFromDayId: dayPlan.copiedFromDayId

@@ -111,6 +111,7 @@ export interface TranslationDictionary {
     dayPlansLoadFailed: string;
     emptyTitle: string;
     emptyBody: string;
+    categoriesTitle: string;
     simpleEditorTitle: string;
     simpleEditorPlaceholder: string;
     structuredEditorTitle: string;
@@ -133,6 +134,14 @@ export interface TranslationDictionary {
       morning: string;
       midday: string;
       evening: string;
+    };
+    categories: {
+      food: string;
+      outing: string;
+      shopping: string;
+      relax: string;
+      transport: string;
+      other: string;
     };
   };
 }

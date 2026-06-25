@@ -111,6 +111,7 @@ export const translationsEn: TranslationDictionary = {
     dayPlansLoadFailed: 'Failed to load day plans.',
     emptyTitle: 'No day plans yet',
     emptyBody: 'This trip exists, but no daily plans have been added yet.',
+    categoriesTitle: 'Categories',
     simpleEditorTitle: 'Simple plan',
     simpleEditorPlaceholder: 'Add a short plan for this day...',
     structuredEditorTitle: 'Structured plan',
@@ -133,6 +134,14 @@ export const translationsEn: TranslationDictionary = {
       morning: 'Morning',
       midday: 'Midday',
       evening: 'Evening'
+    },
+    categories: {
+      food: 'Food',
+      outing: 'Outing',
+      shopping: 'Shopping',
+      relax: 'Relax',
+      transport: 'Transport',
+      other: 'Other'
     }
   }
 };

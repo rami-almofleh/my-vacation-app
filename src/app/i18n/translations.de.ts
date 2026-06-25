@@ -111,6 +111,7 @@ export const translationsDe: TranslationDictionary = {
     dayPlansLoadFailed: 'Tagesplaene konnten nicht geladen werden.',
     emptyTitle: 'Noch keine Tagesplaene',
     emptyBody: 'Dieser Urlaub existiert bereits, aber es wurden noch keine Tage geplant.',
+    categoriesTitle: 'Kategorien',
     simpleEditorTitle: 'Einfache Planung',
     simpleEditorPlaceholder: 'Trage hier kurz ein, was an diesem Tag geplant ist...',
     structuredEditorTitle: 'Strukturierte Planung',
@@ -133,6 +134,14 @@ export const translationsDe: TranslationDictionary = {
       morning: 'Morgen',
       midday: 'Mittag',
       evening: 'Abend'
+    },
+    categories: {
+      food: 'Essen',
+      outing: 'Rausgehen',
+      shopping: 'Einkaufen',
+      relax: 'Entspannen',
+      transport: 'Transport',
+      other: 'Sonstiges'
     }
   }
 };
