@@ -1,0 +1,55 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(ownerId) {
+      return isSignedIn() && request.auth.uid == ownerId;
+    }
+
+    function tripCreateIsValid() {
+      return request.resource.data.ownerId is string
+        && isOwner(request.resource.data.ownerId)
+        && request.resource.data.title is string
+        && request.resource.data.year is int
+        && request.resource.data.peopleCount is int
+        && request.resource.data.startDate is string
+        && request.resource.data.endDate is string;
+    }
+
+    function tripUpdateIsValid() {
+      return isOwner(resource.data.ownerId)
+        && request.resource.data.ownerId == resource.data.ownerId;
+    }
+
+    function dayPlanCreateIsValid() {
+      return request.resource.data.ownerId is string
+        && isOwner(request.resource.data.ownerId)
+        && request.resource.data.tripId is string
+        && request.resource.data.date is string
+        && request.resource.data.mode is string
+        && request.resource.data.status is string;
+    }
+
+    function dayPlanUpdateIsValid() {
+      return isOwner(resource.data.ownerId)
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.tripId == resource.data.tripId;
+    }
+
+    match /trips/{tripId} {
+      allow create: if tripCreateIsValid();
+      allow read, delete: if isOwner(resource.data.ownerId);
+      allow update: if tripUpdateIsValid();
+    }
+
+    match /dayPlans/{dayPlanId} {
+      allow create: if dayPlanCreateIsValid();
+      allow read, delete: if isOwner(resource.data.ownerId);
+      allow update: if dayPlanUpdateIsValid();
+    }
+  }
+}

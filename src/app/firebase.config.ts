@@ -1,15 +1,9 @@
 import { FirebaseOptions, getApp, getApps, initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { environment } from '../environments/environment';
 
-export const firebaseConfig: FirebaseOptions = {
-  apiKey: 'REPLACE_ME',
-  authDomain: 'REPLACE_ME',
-  projectId: 'REPLACE_ME',
-  storageBucket: 'REPLACE_ME',
-  messagingSenderId: 'REPLACE_ME',
-  appId: 'REPLACE_ME'
-};
+export const firebaseConfig: FirebaseOptions = environment.firebaseConfig;
 
 export const firebaseApp = getApps().length
   ? getApp()
