@@ -106,10 +106,29 @@ export interface TranslationDictionary {
     notes: string;
     dayPlansTitle: string;
     dayPlansSubtitle: string;
+    dayPlansCount: string;
     loadingDayPlans: string;
     dayPlansLoadFailed: string;
     emptyTitle: string;
     emptyBody: string;
+    simpleEditorTitle: string;
+    simpleEditorPlaceholder: string;
+    structuredEditorTitle: string;
+    actions: {
+      editSimple: string;
+      switchToSimple: string;
+      editStructured: string;
+      switchToStructured: string;
+      saveSimple: string;
+      savingSimple: string;
+      saveStructured: string;
+      savingStructured: string;
+      cancel: string;
+    };
+    errors: {
+      saveSimpleFailed: string;
+      saveStructuredFailed: string;
+    };
     slots: {
       morning: string;
       midday: string;

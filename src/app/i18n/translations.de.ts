@@ -106,10 +106,29 @@ export const translationsDe: TranslationDictionary = {
     notes: 'Notizen',
     dayPlansTitle: 'Tagesplaene',
     dayPlansSubtitle: 'Hier werden alle Tage dieses Urlaubs angezeigt.',
+    dayPlansCount: 'Tage',
     loadingDayPlans: 'Tagesplaene werden geladen...',
     dayPlansLoadFailed: 'Tagesplaene konnten nicht geladen werden.',
     emptyTitle: 'Noch keine Tagesplaene',
     emptyBody: 'Dieser Urlaub existiert bereits, aber es wurden noch keine Tage geplant.',
+    simpleEditorTitle: 'Einfache Planung',
+    simpleEditorPlaceholder: 'Trage hier kurz ein, was an diesem Tag geplant ist...',
+    structuredEditorTitle: 'Strukturierte Planung',
+    actions: {
+      editSimple: 'Plan bearbeiten',
+      switchToSimple: 'Einfache Planung nutzen',
+      editStructured: 'Zeitfenster bearbeiten',
+      switchToStructured: 'Strukturierte Planung nutzen',
+      saveSimple: 'Speichern',
+      savingSimple: 'Wird gespeichert...',
+      saveStructured: 'Zeitfenster speichern',
+      savingStructured: 'Wird gespeichert...',
+      cancel: 'Abbrechen'
+    },
+    errors: {
+      saveSimpleFailed: 'Der Tagesplan konnte nicht gespeichert werden.',
+      saveStructuredFailed: 'Die strukturierte Planung konnte nicht gespeichert werden.'
+    },
     slots: {
       morning: 'Morgen',
       midday: 'Mittag',

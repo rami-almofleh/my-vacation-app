@@ -106,10 +106,29 @@ export const translationsEn: TranslationDictionary = {
     notes: 'Notes',
     dayPlansTitle: 'Day plans',
     dayPlansSubtitle: 'Each day of the trip will be listed here.',
+    dayPlansCount: 'days',
     loadingDayPlans: 'Loading day plans...',
     dayPlansLoadFailed: 'Failed to load day plans.',
     emptyTitle: 'No day plans yet',
     emptyBody: 'This trip exists, but no daily plans have been added yet.',
+    simpleEditorTitle: 'Simple plan',
+    simpleEditorPlaceholder: 'Add a short plan for this day...',
+    structuredEditorTitle: 'Structured plan',
+    actions: {
+      editSimple: 'Edit plan',
+      switchToSimple: 'Use simple plan',
+      editStructured: 'Edit slots',
+      switchToStructured: 'Use structured plan',
+      saveSimple: 'Save',
+      savingSimple: 'Saving...',
+      saveStructured: 'Save slots',
+      savingStructured: 'Saving...',
+      cancel: 'Cancel'
+    },
+    errors: {
+      saveSimpleFailed: 'Failed to save day plan.',
+      saveStructuredFailed: 'Failed to save structured plan.'
+    },
     slots: {
       morning: 'Morning',
       midday: 'Midday',

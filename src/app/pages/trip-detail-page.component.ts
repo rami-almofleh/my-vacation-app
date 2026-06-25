@@ -9,6 +9,7 @@ import { AuthStateService } from '../services/auth-state.service';
 import { DayPlanService } from '../services/day-plan.service';
 import { LanguageService } from '../services/language.service';
 import { TripService } from '../services/trip.service';
+import { createTripDays } from '../utils/trip-days';
 
 @Component({
   selector: 'app-trip-detail-page',
@@ -57,7 +58,10 @@ import { TripService } from '../services/trip.service';
 
         <section class="day-plan-section">
           <div class="section-heading">
-            <h2>{{ copy().tripDetailPage.dayPlansTitle }}</h2>
+            <div class="section-heading-top">
+              <h2>{{ copy().tripDetailPage.dayPlansTitle }}</h2>
+              <span class="day-count-badge">{{ dayPlans().length }} {{ copy().tripDetailPage.dayPlansCount }}</span>
+            </div>
             <p>{{ copy().tripDetailPage.dayPlansSubtitle }}</p>
           </div>
 
@@ -162,6 +166,23 @@ import { TripService } from '../services/trip.service';
       margin: 0 0 8px;
     }
 
+    .section-heading-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .day-count-badge {
+      border-radius: 999px;
+      background: #eef2f7;
+      color: #4b5563;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
     .trip-notes p,
     .section-heading p,
     .detail-empty p,
@@ -191,6 +212,11 @@ import { TripService } from '../services/trip.service';
 
       .trip-detail-title {
         font-size: 1.7rem;
+      }
+
+      .section-heading-top {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   `]
@@ -281,7 +307,12 @@ export class TripDetailPageComponent implements OnDestroy {
 
       this.dayPlanSubscription = this.dayPlanService.watchDayPlans(tripId).subscribe({
         next: (dayPlans) => {
-          this.dayPlans.set(dayPlans);
+          const dayPlansByDate = new Map(dayPlans.map((dayPlan) => [dayPlan.date, dayPlan]));
+          const mergedDayPlans = createTripDays(trip).map(
+            (generatedDayPlan) => dayPlansByDate.get(generatedDayPlan.date) ?? generatedDayPlan
+          );
+
+          this.dayPlans.set(mergedDayPlans);
           this.isLoadingDayPlans.set(false);
         },
         error: (error) => {

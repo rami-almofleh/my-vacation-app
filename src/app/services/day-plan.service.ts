@@ -18,6 +18,7 @@ import {
 import { db } from '../firebase.config';
 import { DayPlan } from '../models/trip.model';
 import { AuthStateService } from './auth-state.service';
+import { calculateDayPlanStatus } from '../utils/day-plan-status';
 
 type DayPlanDocument = Omit<DayPlan, 'id'>;
 
@@ -97,7 +98,7 @@ export class DayPlanService {
       eveningText: input.eveningText,
       categories: input.categories,
       locationHint: input.locationHint,
-      status: input.status,
+      status: calculateDayPlanStatus(input),
       copiedFromDayId: input.copiedFromDayId,
       createdAt: timestamp,
       updatedAt: timestamp
@@ -122,6 +123,10 @@ export class DayPlanService {
       doc(this.dayPlansCollection, dayPlanId),
       removeUndefinedFields({
         ...updates,
+        status: calculateDayPlanStatus({
+          ...existingDayPlan,
+          ...updates
+        }),
         updatedAt: new Date().toISOString()
       })
     );

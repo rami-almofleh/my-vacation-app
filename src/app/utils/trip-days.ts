@@ -1,4 +1,5 @@
 import { DayPlan, Trip } from '../models/trip.model';
+import { withCalculatedDayPlanStatus } from './day-plan-status';
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -17,7 +18,7 @@ function formatIsoDate(date: Date): string {
 }
 
 export function createEmptyDayPlan(ownerId: string, date: string, tripId?: string): DayPlan {
-  return {
+  return withCalculatedDayPlanStatus({
     ownerId,
     tripId,
     date,
@@ -25,7 +26,7 @@ export function createEmptyDayPlan(ownerId: string, date: string, tripId?: strin
     status: 'empty',
     summaryText: '',
     categories: []
-  };
+  });
 }
 
 export function createDayPlansForDateRange(

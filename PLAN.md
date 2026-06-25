@@ -385,9 +385,9 @@ Für dieses Projekt wird eine runtime-basierte Übersetzungsstrategie verwendet.
 
 ### Phase 3: Tagesplanung
 - [x] Accordion- oder Listenkomponente für Tage erstellen
-- [ ] Tagesstatus `empty`, `partial`, `planned` berechnen
-- [ ] Editor für einfachen Tagesmodus mit Freitext bauen
-- [ ] Editor für strukturierten Tagesmodus mit morgens / mittags / abends bauen
+- [x] Tagesstatus `empty`, `partial`, `planned` berechnen
+- [x] Editor für einfachen Tagesmodus mit Freitext bauen
+- [x] Editor für strukturierten Tagesmodus mit morgens / mittags / abends bauen
 - [ ] Kategorien / Tags pro Tag integrieren
 - [ ] Tagesdaten mit Firestore verbinden
 
@@ -420,4 +420,4 @@ Für dieses Projekt wird eine runtime-basierte Übersetzungsstrategie verwendet.
 6. Ändere nichts außerhalb des aktuellen Schritts, wenn es nicht technisch nötig ist.
 
 ## Nächster auszuführender Schritt
-- [ ] Tagesstatus `empty`, `partial`, `planned` berechnen
+- [ ] Kategorien / Tags pro Tag integrieren
