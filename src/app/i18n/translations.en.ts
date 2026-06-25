@@ -104,6 +104,18 @@ export const translationsEn: TranslationDictionary = {
     dates: 'Dates',
     travelers: 'Travelers',
     notes: 'Notes',
+    overviewTitle: 'Planning overview',
+    overviewSubtitle: 'See which days still need attention before the trip starts.',
+    overviewCards: {
+      empty: 'Unplanned',
+      partial: 'Partially planned',
+      planned: 'Planned'
+    },
+    overviewLists: {
+      empty: 'Days without a plan',
+      partial: 'Days with partial plans',
+      none: 'None'
+    },
     dayPlansTitle: 'Day plans',
     dayPlansSubtitle: 'Each day of the trip will be listed here.',
     dayPlansCount: 'days',

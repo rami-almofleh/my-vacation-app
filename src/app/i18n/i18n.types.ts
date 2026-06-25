@@ -104,6 +104,18 @@ export interface TranslationDictionary {
     dates: string;
     travelers: string;
     notes: string;
+    overviewTitle: string;
+    overviewSubtitle: string;
+    overviewCards: {
+      empty: string;
+      partial: string;
+      planned: string;
+    };
+    overviewLists: {
+      empty: string;
+      partial: string;
+      none: string;
+    };
     dayPlansTitle: string;
     dayPlansSubtitle: string;
     dayPlansCount: string;

@@ -392,7 +392,7 @@ Für dieses Projekt wird eine runtime-basierte Übersetzungsstrategie verwendet.
 - [x] Tagesdaten mit Firestore verbinden
 
 ### Phase 4: Produktlogik
-- [ ] Übersicht für ungeplante und teilweise geplante Tage ergänzen
+- [x] Übersicht für ungeplante und teilweise geplante Tage ergänzen
 - [ ] Kurzvorschau geplanter Inhalte in der Tagesliste anzeigen
 - [ ] Wiederholungs-Hinweise für ähnliche Aktivitäten in nahen Tagen einbauen
 - [ ] Hinweis-Logik als optionale Info umsetzen, nicht als Fehler
@@ -420,4 +420,4 @@ Für dieses Projekt wird eine runtime-basierte Übersetzungsstrategie verwendet.
 6. Ändere nichts außerhalb des aktuellen Schritts, wenn es nicht technisch nötig ist.
 
 ## Nächster auszuführender Schritt
-- [ ] Übersicht für ungeplante und teilweise geplante Tage ergänzen
+- [ ] Kurzvorschau geplanter Inhalte in der Tagesliste anzeigen

@@ -104,6 +104,18 @@ export const translationsDe: TranslationDictionary = {
     dates: 'Daten',
     travelers: 'Reisende',
     notes: 'Notizen',
+    overviewTitle: 'Planungsuebersicht',
+    overviewSubtitle: 'Sieh sofort, welche Tage noch offen oder nur teilweise geplant sind.',
+    overviewCards: {
+      empty: 'Ungeplant',
+      partial: 'Teilweise geplant',
+      planned: 'Geplant'
+    },
+    overviewLists: {
+      empty: 'Tage ohne Planung',
+      partial: 'Tage mit Teilplanung',
+      none: 'Keine'
+    },
     dayPlansTitle: 'Tagesplaene',
     dayPlansSubtitle: 'Hier werden alle Tage dieses Urlaubs angezeigt.',
     dayPlansCount: 'Tage',

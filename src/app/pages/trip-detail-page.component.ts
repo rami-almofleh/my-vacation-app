@@ -56,6 +56,54 @@ import { createTripDays } from '../utils/trip-days';
           <p>{{ currentTrip.notes }}</p>
         </section>
 
+        <section *ngIf="hasDayPlans()" class="overview-panel">
+          <div class="section-heading">
+            <h2>{{ copy().tripDetailPage.overviewTitle }}</h2>
+            <p>{{ copy().tripDetailPage.overviewSubtitle }}</p>
+          </div>
+
+          <div class="overview-cards">
+            <article class="overview-card">
+              <span class="overview-card-label">{{ copy().tripDetailPage.overviewCards.empty }}</span>
+              <strong class="overview-card-value">{{ emptyDayPlans().length }}</strong>
+            </article>
+            <article class="overview-card">
+              <span class="overview-card-label">{{ copy().tripDetailPage.overviewCards.partial }}</span>
+              <strong class="overview-card-value">{{ partialDayPlans().length }}</strong>
+            </article>
+            <article class="overview-card">
+              <span class="overview-card-label">{{ copy().tripDetailPage.overviewCards.planned }}</span>
+              <strong class="overview-card-value">{{ plannedDayPlans().length }}</strong>
+            </article>
+          </div>
+
+          <div class="overview-lists">
+            <div class="overview-list">
+              <h3>{{ copy().tripDetailPage.overviewLists.empty }}</h3>
+              <div *ngIf="emptyDayPlans().length; else noEmptyDays" class="overview-chip-list">
+                <span *ngFor="let dayPlan of emptyDayPlans()" class="overview-chip">
+                  {{ dayPlan.date }}
+                </span>
+              </div>
+              <ng-template #noEmptyDays>
+                <p class="overview-empty">{{ copy().tripDetailPage.overviewLists.none }}</p>
+              </ng-template>
+            </div>
+
+            <div class="overview-list">
+              <h3>{{ copy().tripDetailPage.overviewLists.partial }}</h3>
+              <div *ngIf="partialDayPlans().length; else noPartialDays" class="overview-chip-list">
+                <span *ngFor="let dayPlan of partialDayPlans()" class="overview-chip">
+                  {{ dayPlan.date }}
+                </span>
+              </div>
+              <ng-template #noPartialDays>
+                <p class="overview-empty">{{ copy().tripDetailPage.overviewLists.none }}</p>
+              </ng-template>
+            </div>
+          </div>
+        </section>
+
         <section class="day-plan-section">
           <div class="section-heading">
             <div class="section-heading-top">
@@ -110,6 +158,7 @@ import { createTripDays } from '../utils/trip-days';
 
     .trip-detail-header,
     .trip-notes,
+    .overview-panel,
     .detail-state,
     .detail-empty {
       border: 1px solid #d9dee7;
@@ -119,6 +168,7 @@ import { createTripDays } from '../utils/trip-days';
 
     .trip-detail-header,
     .trip-notes,
+    .overview-panel,
     .detail-state,
     .detail-empty {
       padding: 20px;
@@ -190,6 +240,67 @@ import { createTripDays } from '../utils/trip-days';
       margin: 0;
     }
 
+    .overview-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .overview-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .overview-card {
+      border: 1px solid #e5eaf1;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 14px 16px;
+    }
+
+    .overview-card-label {
+      display: block;
+      margin-bottom: 6px;
+      color: #5b6472;
+      font-size: 0.85rem;
+    }
+
+    .overview-card-value {
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    .overview-lists {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .overview-list h3 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+
+    .overview-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .overview-chip {
+      border-radius: 999px;
+      background: #eef2f7;
+      color: #4b5563;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .overview-empty {
+      color: #5b6472;
+    }
+
     .detail-state-error {
       border-color: #f0b6b6;
       color: #8a2424;
@@ -217,6 +328,11 @@ import { createTripDays } from '../utils/trip-days';
       .section-heading-top {
         flex-direction: column;
         align-items: flex-start;
+      }
+
+      .overview-cards,
+      .overview-lists {
+        grid-template-columns: 1fr;
       }
     }
   `]
@@ -246,6 +362,9 @@ export class TripDetailPageComponent implements OnDestroy {
     return this.authStateService.currentUser() ? 'ready' : 'signed-out';
   });
   readonly hasDayPlans = computed(() => this.dayPlans().length > 0);
+  readonly emptyDayPlans = computed(() => this.dayPlans().filter((dayPlan) => dayPlan.status === 'empty'));
+  readonly partialDayPlans = computed(() => this.dayPlans().filter((dayPlan) => dayPlan.status === 'partial'));
+  readonly plannedDayPlans = computed(() => this.dayPlans().filter((dayPlan) => dayPlan.status === 'planned'));
   
   private readonly routeSubscription: Subscription = this.route.paramMap.subscribe((params) => {
     this.tripId.set(params.get('tripId'));

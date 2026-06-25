@@ -16,7 +16,12 @@ import { LanguageService } from '../services/language.service';
         <summary class="day-plan-summary-row">
           <div class="day-plan-summary-main">
             <strong>{{ dayPlan.date }}</strong>
-            <span class="day-plan-status">{{ dayPlan.status }}</span>
+            <div class="day-plan-summary-meta">
+              <span *ngFor="let category of dayPlan.categories" class="category-chip category-chip-compact">
+                {{ getCategoryLabel(category) }}
+              </span>
+              <span class="day-plan-status">{{ dayPlan.status }}</span>
+            </div>
           </div>
           <span class="day-plan-preview" *ngIf="getPreviewText(dayPlan)">
             {{ getPreviewText(dayPlan) }}
@@ -26,19 +31,11 @@ import { LanguageService } from '../services/language.service';
         <div class="day-plan-body">
           <h3 *ngIf="dayPlan.title" class="day-plan-title">{{ dayPlan.title }}</h3>
           <p *ngIf="dayPlan.summaryText" class="day-plan-text">{{ dayPlan.summaryText }}</p>
-
-          <div *ngIf="dayPlan.categories?.length" class="category-chip-list">
-            <span *ngFor="let category of dayPlan.categories" class="category-chip">
-              {{ getCategoryLabel(category) }}
-            </span>
-          </div>
-
-          <div *ngIf="dayPlan.mode === 'simple'" class="simple-editor">
+          <div *ngIf="shouldShowSimpleSection(dayPlan)" class="simple-editor">
             <div class="simple-editor-header">
-              <span class="slot-label">{{ copy().tripDetailPage.simpleEditorTitle }}</span>
               <div class="editor-header-actions">
                 <button
-                  *ngIf="editingDayKey() !== getDayKey(dayPlan)"
+                  *ngIf="!isEditingDay(dayPlan)"
                   type="button"
                   class="simple-editor-button"
                   (click)="openSimpleEditor(dayPlan)"
@@ -56,7 +53,7 @@ import { LanguageService } from '../services/language.service';
             </div>
 
             <form
-              *ngIf="editingDayKey() === getDayKey(dayPlan)"
+              *ngIf="isEditingDay(dayPlan) && editMode() === 'simple'"
               class="simple-editor-form"
               [formGroup]="simpleEditorForm"
               (ngSubmit)="saveSimplePlan(dayPlan)"
@@ -104,12 +101,11 @@ import { LanguageService } from '../services/language.service';
             </form>
           </div>
 
-          <div class="day-plan-grid" *ngIf="dayPlan.mode === 'structured'">
+          <div *ngIf="shouldShowStructuredSection(dayPlan)" class="structured-editor">
             <div class="simple-editor-header structured-editor-header">
-              <span class="slot-label">{{ copy().tripDetailPage.structuredEditorTitle }}</span>
               <div class="editor-header-actions">
                 <button
-                  *ngIf="editingDayKey() !== getDayKey(dayPlan)"
+                  *ngIf="!isEditingDay(dayPlan)"
                   type="button"
                   class="simple-editor-button"
                   (click)="openStructuredEditor(dayPlan)"
@@ -126,17 +122,19 @@ import { LanguageService } from '../services/language.service';
               </div>
             </div>
 
-            <div *ngIf="dayPlan.morningText">
-              <span class="slot-label">{{ copy().tripDetailPage.slots.morning }}</span>
-              <p class="day-plan-text">{{ dayPlan.morningText }}</p>
-            </div>
-            <div *ngIf="dayPlan.middayText">
-              <span class="slot-label">{{ copy().tripDetailPage.slots.midday }}</span>
-              <p class="day-plan-text">{{ dayPlan.middayText }}</p>
-            </div>
-            <div *ngIf="dayPlan.eveningText">
-              <span class="slot-label">{{ copy().tripDetailPage.slots.evening }}</span>
-              <p class="day-plan-text">{{ dayPlan.eveningText }}</p>
+            <div class="day-plan-grid">
+              <div *ngIf="dayPlan.morningText">
+                <span class="slot-label">{{ copy().tripDetailPage.slots.morning }}</span>
+                <p class="day-plan-text">{{ dayPlan.morningText }}</p>
+              </div>
+              <div *ngIf="dayPlan.middayText">
+                <span class="slot-label">{{ copy().tripDetailPage.slots.midday }}</span>
+                <p class="day-plan-text">{{ dayPlan.middayText }}</p>
+              </div>
+              <div *ngIf="dayPlan.eveningText">
+                <span class="slot-label">{{ copy().tripDetailPage.slots.evening }}</span>
+                <p class="day-plan-text">{{ dayPlan.eveningText }}</p>
+              </div>
             </div>
           </div>
 
@@ -232,6 +230,14 @@ import { LanguageService } from '../services/language.service';
       align-items: center;
     }
 
+    .day-plan-summary-meta {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
     .day-plan-status,
     .day-plan-preview {
       color: #5b6472;
@@ -288,6 +294,10 @@ import { LanguageService } from '../services/language.service';
       font-weight: 600;
     }
 
+    .category-chip-compact {
+      margin: 0;
+    }
+
     .simple-editor {
       margin-top: 12px;
     }
@@ -303,11 +313,16 @@ import { LanguageService } from '../services/language.service';
       margin-bottom: 12px;
     }
 
+    .structured-editor {
+      margin-top: 12px;
+    }
+
     .editor-header-actions {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
       justify-content: flex-end;
+      margin-left: auto;
     }
 
     .simple-editor-button,
@@ -405,6 +420,15 @@ import { LanguageService } from '../services/language.service';
         grid-template-columns: 1fr;
       }
 
+      .day-plan-summary-main {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .day-plan-summary-meta {
+        justify-content: flex-start;
+      }
+
       .simple-editor-header,
       .structured-editor-header,
       .simple-editor-actions {
@@ -453,6 +477,26 @@ export class DayPlanListComponent {
 
   getDayKey(dayPlan: DayPlan): string {
     return dayPlan.id ?? dayPlan.date;
+  }
+
+  isEditingDay(dayPlan: DayPlan): boolean {
+    return this.editingDayKey() === this.getDayKey(dayPlan);
+  }
+
+  shouldShowSimpleSection(dayPlan: DayPlan): boolean {
+    if (this.isEditingDay(dayPlan)) {
+      return this.editMode() === 'simple';
+    }
+
+    return dayPlan.mode === 'simple';
+  }
+
+  shouldShowStructuredSection(dayPlan: DayPlan): boolean {
+    if (this.isEditingDay(dayPlan)) {
+      return this.editMode() === 'structured';
+    }
+
+    return dayPlan.mode === 'structured';
   }
 
   getCategoryLabel(category: DayCategory): string {
