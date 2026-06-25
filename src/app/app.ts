@@ -139,6 +139,11 @@ export class App {
         endDate,
         notes: notes.trim() || undefined
       });
+      await this.dayPlanService.syncTripDayPlans({
+        id: tripId,
+        startDate,
+        endDate
+      });
 
       this.closeCreateTripDialog();
       await this.router.navigate(['/trips', tripId]);

@@ -389,7 +389,7 @@ Für dieses Projekt wird eine runtime-basierte Übersetzungsstrategie verwendet.
 - [x] Editor für einfachen Tagesmodus mit Freitext bauen
 - [x] Editor für strukturierten Tagesmodus mit morgens / mittags / abends bauen
 - [x] Kategorien / Tags pro Tag integrieren
-- [ ] Tagesdaten mit Firestore verbinden
+- [x] Tagesdaten mit Firestore verbinden
 
 ### Phase 4: Produktlogik
 - [ ] Übersicht für ungeplante und teilweise geplante Tage ergänzen
@@ -420,4 +420,4 @@ Für dieses Projekt wird eine runtime-basierte Übersetzungsstrategie verwendet.
 6. Ändere nichts außerhalb des aktuellen Schritts, wenn es nicht technisch nötig ist.
 
 ## Nächster auszuführender Schritt
-- [ ] Tagesdaten mit Firestore verbinden
+- [ ] Übersicht für ungeplante und teilweise geplante Tage ergänzen

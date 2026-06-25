@@ -16,9 +16,10 @@ import {
 } from 'firebase/firestore';
 
 import { db } from '../firebase.config';
-import { DayPlan } from '../models/trip.model';
+import { DayPlan, Trip } from '../models/trip.model';
 import { AuthStateService } from './auth-state.service';
 import { calculateDayPlanStatus } from '../utils/day-plan-status';
+import { createDayPlansForDateRange } from '../utils/trip-days';
 
 type DayPlanDocument = Omit<DayPlan, 'id'>;
 
@@ -160,6 +161,50 @@ export class DayPlanService {
     const snapshot = await getDocs(dayPlansQuery);
 
     await Promise.all(snapshot.docs.map((dayPlanDocument) => deleteDoc(dayPlanDocument.ref)));
+  }
+
+  async syncTripDayPlans(trip: Pick<Trip, 'id' | 'startDate' | 'endDate'>): Promise<void> {
+    if (!trip.id) {
+      throw new Error('Trip id is required to sync day plans.');
+    }
+
+    const ownerId = this.authStateService.getRequiredUserId();
+    const dayPlansQuery = query(
+      this.dayPlansCollection,
+      where('ownerId', '==', ownerId),
+      where('tripId', '==', trip.id)
+    );
+    const snapshot = await getDocs(dayPlansQuery);
+    const existingDayPlanDocumentsByDate = new Map(
+      snapshot.docs.map((dayPlanDocument) => [dayPlanDocument.data().date, dayPlanDocument])
+    );
+    const expectedDayPlans = createDayPlansForDateRange(ownerId, trip.startDate, trip.endDate, trip.id);
+    const expectedDates = new Set(expectedDayPlans.map((dayPlan) => dayPlan.date));
+    const timestamp = new Date().toISOString();
+
+    await Promise.all(
+      snapshot.docs
+        .filter((dayPlanDocument) => !expectedDates.has(dayPlanDocument.data().date))
+        .map((dayPlanDocument) => deleteDoc(dayPlanDocument.ref))
+    );
+
+    await Promise.all(
+      expectedDayPlans
+        .filter((dayPlan) => !existingDayPlanDocumentsByDate.has(dayPlan.date))
+        .map((dayPlan) =>
+          addDoc(this.dayPlansCollection, {
+            ownerId,
+            tripId: trip.id,
+            date: dayPlan.date,
+            mode: dayPlan.mode,
+            summaryText: dayPlan.summaryText,
+            categories: dayPlan.categories,
+            status: dayPlan.status,
+            createdAt: timestamp,
+            updatedAt: timestamp
+          })
+        )
+    );
   }
 
   private mapDayPlanDocument(dayPlanDocument: QueryDocumentSnapshot<DayPlanDocument>): DayPlan {

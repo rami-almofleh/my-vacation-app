@@ -787,6 +787,11 @@ export class TripsPageComponent implements OnDestroy {
         endDate,
         notes: notes.trim() || undefined
       });
+      await this.dayPlanService.syncTripDayPlans({
+        id: tripId,
+        startDate,
+        endDate
+      });
       this.closeEditTripDialog();
     } catch (error) {
       this.editTripError.set(
